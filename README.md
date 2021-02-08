@@ -1,2 +1,3 @@
-# www
-www.etherscapes.io
+# Etherscapes-www
+
+Machine generated art preview frontend. www.etherscapes.io
