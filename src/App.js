@@ -7,6 +7,7 @@ import React, { Component } from "react";
 import Web3 from "web3";
 
 import PackStore from "./components/PackStore.js";
+import SceneManager from "./components/SceneManager.js";
 
 // Contract ABIs.
 import _EscapeToken from "./contract/EscapeToken.json";
@@ -36,7 +37,7 @@ class App extends Component {
       escape_balance: 0,
 
       // Number of packs minted so far.
-      total_packs: 0, 
+      totalPacks: 0, 
       packs: [],
     };
 	}
@@ -95,6 +96,38 @@ class App extends Component {
     }
   }
 
+  updatePacks = async () => {
+    const _np = await this.contracts.estilepack.numPacksCreated();
+    const totalPacks = _np.toNumber();
+
+    /*
+     *  All pack token ids start at 1, query stats for each one so we know how 
+     *  many are left, if they can be purchased and our personal count for them.
+     * 
+     *  The `PackStore` component is how we open / purchase / see our packs.
+     */
+    let packs = [];
+    for (var pidx = 1; pidx <= totalPacks; pidx++) {
+      const _desc = await this.contracts.estilepack.getPackInfo(pidx);
+      const _bal  = await this.contracts.estilepack.balanceOf(this.accounts[0], pidx);
+      packs.push({
+        packId: pidx,
+        sceneId: _desc[0].toNumber(),
+        escapeCost: _desc[1].toNumber(),
+        isPurchaseable: _desc[2],
+        tilesPerPack: _desc[3].toNumber(),
+        maxQuant: _desc[4].toNumber(),
+        packsLeft: _desc[5].toNumber(),
+        balance: _bal.toNumber(),
+      });
+    }
+
+    return {
+      totalPacks: totalPacks, 
+      packs: packs,
+    };
+  }
+
 	instantiateContracts = async () => {
 		const contract = require("@truffle/contract");
 		
@@ -113,34 +146,65 @@ class App extends Component {
     this.contracts.estilepack = await this.contracts_abi.ESTilePack.deployed();
     this.contracts.estilewrap = await this.contracts_abi.ESTileWrapper.deployed();
 
-    // Figure out how many packs we have available for sale.
-    const _np = await this.contracts.estilepack.numPacksCreated();
-    const totalPacks = _np.toNumber();
+    /*
+     *  Figure out how many packs we have available for sale.
+     */
     
-    // All pack token ids start at 1, query stats for each one.
-    let packs = [];
-    for (var pidx = 1; pidx <= totalPacks; pidx++) {
-      const _desc = await this.contracts.estilepack.getPackInfo(pidx);
-      const _bal  = await this.contracts.estilepack.balanceOf(this.accounts[0], pidx);
-      packs.push({
-        sceneId: _desc[0].toNumber(),
-        escapeCost: _desc[1].toNumber(),
-        isPurchaseable: _desc[2],
-        tilesPerPack: _desc[3].toNumber(),
-        maxQuant: _desc[4].toNumber(),
-        packsLeft: _desc[5].toNumber(),
-        balance: _bal.toNumber(),
-      });
+    let packsDesc = await this.updatePacks();
+    
+    /*
+     *  Now we need to figure how many scenes there are and how many puzzles 
+     *  in each scene. If we have tokens that correspond to a scene, we list 
+     *  them here.
+     */
+    let _scenes = await this.contracts.estile.numScenes();
+    const numScenes = _scenes.toNumber();
+    let scenes = [];
+    for (var sidx = 1; sidx <= numScenes; sidx++) {
+      const _tokRange = await this.contracts.estile.tokenRangeForScene(sidx);
+      const numTiles   = _tokRange[1].toNumber();
+      const numPuzzles = _tokRange[2].toNumber();
+      
+      // Ranges for the tokens in this scene. 
+      const start_tile_range = _tokRange[0].toNumber();
+      const end_tile_range = start_tile_range + numTiles - 1;
+      const start_puzzle_range = end_tile_range + 1;
+      const end_puzzle_range = start_puzzle_range + numPuzzles - 1;
+      
+      let tileTokens = [];
+      for (var ttok = start_tile_range; ttok <= end_tile_range; ttok++) {
+        const _b = await this.contracts.estile.balanceOf(this.accounts[0], ttok);
+        tileTokens.push(_b.toNumber());
+      }
+      
+      let puzzleTokens = [];
+      for (var ptok = start_puzzle_range; ptok <= end_puzzle_range; ptok++) {
+        const _b = await this.contracts.estile.balanceOf(this.accounts[0], ptok);
+        puzzleTokens.push(_b.toNumber());
+      }
+
+      let sceneDesc = {
+        sceneId: sidx,
+        tileTokenStart: start_tile_range,
+        tileTokenEnd: end_tile_range,
+        puzzleTokenStart: start_puzzle_range,
+        puzzleTokenEnd: end_puzzle_range,
+        numTiles: numTiles,
+        numPuzzles: numPuzzles,
+        tileTokens: tileTokens,
+        puzzleTokens: puzzleTokens,
+      };
+      scenes.push(sceneDesc);
     }
 
-    // 
+    /*
+     *  Update app state!
+     */
     this.setState({
-      total_packs: totalPacks,
-      packs: packs,
+      totalPacks: packsDesc.totalPacks,
+      packs: packsDesc.packs,
+      scenes: scenes,
     });
-
-    // console.log(x);
-    // this.updateApp();
 	}
 
 	subscribeToEvents = async () => {
@@ -182,12 +246,15 @@ class App extends Component {
 					EtherScapes
 				</div>
         <div className="App-body">
-          <div>Packs={this.state.total_packs}</div>
+          <div>Packs={this.state.totalPacks}</div>
           <div>ESCAPE={this.state.escape_balance}</div>
           <PackStore 
             packs={this.state.packs} 
             estilewrap={this.contracts.estilewrap} 
             estilepack={this.contracts.estilepack} 
+            user={this.accounts[0]} />
+          <SceneManager 
+            scenes={this.state.scenes}
             user={this.accounts[0]} />
         </div>
       </div>

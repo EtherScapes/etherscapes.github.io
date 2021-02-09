@@ -11,6 +11,10 @@ const PackStore = (props) => {
     });
   }
 
+  const openPack = async (p, count=1) => {
+    await props.estilepack.open(p, count, {from: props.user});
+  }
+
   const packs = props.packs.map((pack, i) => {
     const packId = i + 1;
     return (
@@ -21,10 +25,13 @@ const PackStore = (props) => {
         <div>tilesPerPack = {pack.tilesPerPack}</div>
         <div>maxQuant = {pack.maxQuant}</div>
         <div>packsLeft = {pack.packsLeft}</div>
-        <div>You own   = {pack.balance}</div>
         {pack.isPurchaseable && pack.packsLeft > 0 && 
           <div onClick={() => {buyPack(packId, 1);}}>BUY 0.1 ETH</div>
         }
+        <div>
+          You own {pack.balance} packs.
+          {pack.balance > 0 && <span onClick={()=>{openPack(packId, 1);}}>open?</span>}
+        </div>
       </div>
     );
   });
