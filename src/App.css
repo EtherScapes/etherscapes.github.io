@@ -28,6 +28,203 @@ html, body {
   display: flex;
   flex: 1;
   flex-direction: column;
+}
 
-  padding: 0px 5% 0px 5%;
+/*
+ *  Common rules.
+ */
+
+.col {
+  display: flex;
+  flex-direction: row;
+}
+.grow {
+  flex-grow: 1; 
+}
+.float {
+  padding: 4px;
+  background-color: #ecc60db0;
+}
+.underline {
+  padding-bottom: 5px;
+  border-bottom: 2px solid #424242;
+  margin-bottom: 5px;
+}
+
+/*
+ *  Header rules.
+ */
+.App-header {
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+  background-color: #3d3d3d;
+  justify-content: flex-start;
+  align-items: center;
+}
+.App-header a {
+  margin: 20px;
+  color: #cdcdcd;
+  cursor: pointer;
+  text-decoration: none;
+}
+.App-header a:visited {
+  color: #cdcdcd;
+}
+
+.App-header a.isActive,
+.App-header a:hover {
+  color: #cdcd3d;
+}
+.App-header .balance {
+  color: #cdcdcd;
+  margin-right: 20px;
+}
+
+/******************************************************************************/
+/*
+ *  Packs 
+ */
+.Packs-main {
+  margin: 0px 5% 0px 5%;
+}
+.PackStore-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+ }
+.PackStore-pack {
+  margin: 20px;
+  padding: 10px;
+}
+.PackStore-pack .col div:first-child {
+  flex-grow: 1;
+}
+.PackStore-pack img {
+  width: 320px;
+  min-height: 180px;
+}
+.PackStore-pack .pack {
+  padding: 8px;
+  background:#ecc60d;
+  border: solid 1px #222222;
+
+  box-shadow: 1px 0px 0px #999999,0px 1px 0px #999999,
+              2px 1px 0px #444444,1px 2px 0px #444444,
+              3px 2px 0px #222222,2px 3px 0px #222222,
+              4px 3px 0px #999999,3px 4px 0px #999999,
+              5px 4px 0px #444444,4px 5px 0px #444444,
+              6px 5px 0px #222222,5px 6px 0px #222222,
+              7px 6px 0px #999999,6px 7px 0px #999999,
+              8px 7px 0px #444444,7px 8px 0px #444444,
+              9px 8px 0px #222222,8px 9px 0px #222222;
+}
+
+.PackStore-pack .button {
+  margin: 5px;
+  padding: 5px;
+  cursor: pointer;
+
+  background:#03A9F4;
+  border: solid 1px #1976D2;
+
+  box-shadow: 
+    1px 0px 0px #444444,0px 1px 0px #444444,
+    2px 1px 0px #1976D2,1px 2px 0px #1976D2,
+    3px 2px 0px #444444,2px 3px 0px #444444;
+}
+
+.PackStore-pack .button:hover {
+  background:#ecc60d;
+  box-shadow: 
+    1px 0px 0px #444444,0px 1px 0px #444444,
+    2px 1px 0px #ecc60d,1px 2px 0px #ecc60d,
+    3px 2px 0px #444444,2px 3px 0px #444444;
+}
+
+.PackStore-pack .pack .col {
+  position: relative;
+  top: -12px;
+  height: 0;
+}
+.PackStore-pack .col {
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/******************************************************************************/
+ /*
+  *  Home
+  */
+
+.canvas {
+  width: 80vw;
+  margin-top: 20px;
+  margin-left: 8vw;
+  border: 2vw solid black;
+  /* height: 100%; */
+  background-color: beige;
+}
+
+.Home-main h3 {
+  padding-left: 25px;
+}
+.Home-main h3 span {
+  margin: 5px;
+  cursor: pointer;
+  color: #03A9F4;
+  user-select: none;
+}
+.Home-main h3 .spacer {
+  width: 50px;
+}
+
+.token-table {
+  margin: 25px auto;
+  max-width: 80%;
+}
+
+.token-table .th {
+  display: flex;
+  flex-direction: row;
+  flex-basis: 12;
+}
+.token-table .th>div {
+  padding: 5px;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.token-table .th>div:nth-child(1) {
+  flex: 3;
+  justify-content: flex-start;
+  padding-left: 20px;
+}
+.token-table .th>div:nth-child(1)>img{
+  margin-right: 15px;
+}
+.token-table .th>div:nth-child(2) {
+  flex: 2;
+}
+.token-table .th>div:nth-child(3) {
+  flex: 2;
+}
+.token-table .th>div:nth-child(4) {
+  flex: 5;
+}
+
+/******************************************************************************/
+
+.About-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 90%;
+  margin: 0 auto;
 }

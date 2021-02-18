@@ -4,10 +4,11 @@
 
 // React and associated components.
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
+
 import Web3 from "web3";
 
-import PackStore from "./components/PackStore.js";
-import SceneManager from "./components/SceneManager.js";
+import MainLayout from "./pages/MainLayout.js";
 
 // Contract ABIs.
 import _EscapeToken from "./contract/EscapeToken.json";
@@ -19,6 +20,9 @@ import _ESTileWrapper from "./contract/ESTileWrapper.json";
 import "./App.css";
 
 ////////////////////////////////////////////////////////////////////////////////
+
+const UniswapABI = [{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"address","name":"minter_","type":"address"},{"internalType":"uint256","name":"mintingAllowedAfter_","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"delegator","type":"address"},{"indexed":true,"internalType":"address","name":"fromDelegate","type":"address"},{"indexed":true,"internalType":"address","name":"toDelegate","type":"address"}],"name":"DelegateChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"delegate","type":"address"},{"indexed":false,"internalType":"uint256","name":"previousBalance","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"DelegateVotesChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"minter","type":"address"},{"indexed":false,"internalType":"address","name":"newMinter","type":"address"}],"name":"MinterChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":true,"inputs":[],"name":"DELEGATION_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"DOMAIN_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"PERMIT_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"rawAmount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint32","name":"","type":"uint32"}],"name":"checkpoints","outputs":[{"internalType":"uint32","name":"fromBlock","type":"uint32"},{"internalType":"uint96","name":"votes","type":"uint96"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"delegatee","type":"address"}],"name":"delegate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"delegatee","type":"address"},{"internalType":"uint256","name":"nonce","type":"uint256"},{"internalType":"uint256","name":"expiry","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"delegateBySig","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"delegates","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"getCurrentVotes","outputs":[{"internalType":"uint96","name":"","type":"uint96"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"blockNumber","type":"uint256"}],"name":"getPriorVotes","outputs":[{"internalType":"uint96","name":"","type":"uint96"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"minimumTimeBetweenMints","outputs":[{"internalType":"uint32","name":"","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"rawAmount","type":"uint256"}],"name":"mint","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"mintCap","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"minter","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"mintingAllowedAfter","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"nonces","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"numCheckpoints","outputs":[{"internalType":"uint32","name":"","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"rawAmount","type":"uint256"},{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"permit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"minter_","type":"address"}],"name":"setMinter","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"rawAmount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"src","type":"address"},{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"rawAmount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}];
+
 
 class App extends Component {
 	// App constructor - sets up default state.
@@ -34,11 +38,14 @@ class App extends Component {
 
     this.state = {
       // Number of ESCAPE credit balance for user.
-      escape_balance: 0,
+      escapeBalance: 0,
 
       // Number of packs minted so far.
       totalPacks: 0, 
       packs: [],
+
+      // Total scene info stuff
+      numScenes: 0,
     };
 	}
 
@@ -128,9 +135,14 @@ class App extends Component {
     };
   }
 
-	instantiateContracts = async () => {
+  updateEscapeBalance = async () => {
+    const _b = await this.contracts.escape.balanceOf(this.accounts[0]);
+    return _b.toNumber();
+  }
+
+  instantiateContracts = async () => {
 		const contract = require("@truffle/contract");
-		
+    
 		this.contracts_abi.EscapeToken = contract(_EscapeToken);
 		this.contracts_abi.ESTile = contract(_ESTile);
 		this.contracts_abi.ESTilePack = contract(_ESTilePack);
@@ -146,56 +158,61 @@ class App extends Component {
     this.contracts.estilepack = await this.contracts_abi.ESTilePack.deployed();
     this.contracts.estilewrap = await this.contracts_abi.ESTileWrapper.deployed();
 
+    
+
     /*
      *  Figure out how many packs we have available for sale.
      */
     
     let packsDesc = await this.updatePacks();
+
+    let escapeBalance = await this.updateEscapeBalance();
     
     /*
      *  Now we need to figure how many scenes there are and how many puzzles 
      *  in each scene. If we have tokens that correspond to a scene, we list 
      *  them here.
      */
-    let _scenes = await this.contracts.estile.numScenes();
+    let _scenes = await this.contracts.estile.sceneCount();
     const numScenes = _scenes.toNumber();
-    let scenes = [];
-    for (var sidx = 1; sidx <= numScenes; sidx++) {
-      const _tokRange = await this.contracts.estile.tokenRangeForScene(sidx);
-      const numTiles   = _tokRange[1].toNumber();
-      const numPuzzles = _tokRange[2].toNumber();
+    
+    // let scenes = [];
+    // for (var sidx = 1; sidx <= numScenes; sidx++) {
+    //   const _tokRange = await this.contracts.estile.tokenRangeForScene(sidx);
+    //   const numTiles   = _tokRange[1].toNumber();
+    //   const numPuzzles = _tokRange[2].toNumber();
       
-      // Ranges for the tokens in this scene. 
-      const start_tile_range = _tokRange[0].toNumber();
-      const end_tile_range = start_tile_range + numTiles - 1;
-      const start_puzzle_range = end_tile_range + 1;
-      const end_puzzle_range = start_puzzle_range + numPuzzles - 1;
+    //   // Ranges for the tokens in this scene. 
+    //   const start_tile_range = _tokRange[0].toNumber();
+    //   const end_tile_range = start_tile_range + numTiles - 1;
+    //   const start_puzzle_range = end_tile_range + 1;
+    //   const end_puzzle_range = start_puzzle_range + numPuzzles - 1;
       
-      let tileTokens = [];
-      for (var ttok = start_tile_range; ttok <= end_tile_range; ttok++) {
-        const _b = await this.contracts.estile.balanceOf(this.accounts[0], ttok);
-        tileTokens.push(_b.toNumber());
-      }
+    //   let tileTokens = [];
+    //   for (var ttok = start_tile_range; ttok <= end_tile_range; ttok++) {
+    //     const _b = await this.contracts.estile.balanceOf(this.accounts[0], ttok);
+    //     tileTokens.push(_b.toNumber());
+    //   }
       
-      let puzzleTokens = [];
-      for (var ptok = start_puzzle_range; ptok <= end_puzzle_range; ptok++) {
-        const _b = await this.contracts.estile.balanceOf(this.accounts[0], ptok);
-        puzzleTokens.push(_b.toNumber());
-      }
+    //   let puzzleTokens = [];
+    //   for (var ptok = start_puzzle_range; ptok <= end_puzzle_range; ptok++) {
+    //     const _b = await this.contracts.estile.balanceOf(this.accounts[0], ptok);
+    //     puzzleTokens.push(_b.toNumber());
+    //   }
 
-      let sceneDesc = {
-        sceneId: sidx,
-        tileTokenStart: start_tile_range,
-        tileTokenEnd: end_tile_range,
-        puzzleTokenStart: start_puzzle_range,
-        puzzleTokenEnd: end_puzzle_range,
-        numTiles: numTiles,
-        numPuzzles: numPuzzles,
-        tileTokens: tileTokens,
-        puzzleTokens: puzzleTokens,
-      };
-      scenes.push(sceneDesc);
-    }
+    //   let sceneDesc = {
+    //     sceneId: sidx,
+    //     tileTokenStart: start_tile_range,
+    //     tileTokenEnd: end_tile_range,
+    //     puzzleTokenStart: start_puzzle_range,
+    //     puzzleTokenEnd: end_puzzle_range,
+    //     numTiles: numTiles,
+    //     numPuzzles: numPuzzles,
+    //     tileTokens: tileTokens,
+    //     puzzleTokens: puzzleTokens,
+    //   };
+    //   scenes.push(sceneDesc);
+    // }
 
     /*
      *  Update app state!
@@ -203,7 +220,9 @@ class App extends Component {
     this.setState({
       totalPacks: packsDesc.totalPacks,
       packs: packsDesc.packs,
-      scenes: scenes,
+      numScenes: numScenes,
+      // scenes: scenes,
+      escapeBalance: escapeBalance,
     });
 	}
 
@@ -233,7 +252,6 @@ class App extends Component {
 	////////////////////////////////////////////////////////////////////////////
 	// Contract interaction.
 	////////////////////////////////////////////////////////////////////////////
-
 	
 	////////////////////////////////////////////////////////////////////////////
 	// User Interaction.
@@ -243,19 +261,22 @@ class App extends Component {
 		return (
 		  <div className="App">
 				<div className="App-header">
-					EtherScapes
+					<NavLink to="/">EtherScapes</NavLink>
+          <NavLink activeClassName="isActive" to="/packs">Packs</NavLink>
+          <NavLink activeClassName="isActive" to="/about">About</NavLink>
+          <div className="grow"></div>
+          <div className="balance">{this.state.escapeBalance} ESC</div>
 				</div>
         <div className="App-body">
-          <div>Packs={this.state.totalPacks}</div>
-          <div>ESCAPE={this.state.escape_balance}</div>
-          <PackStore 
+          <MainLayout 
+            balance={this.state.escapeBalance}
             packs={this.state.packs} 
+            scenes={this.state.scenes}
+            estile={this.contracts.estile}
             estilewrap={this.contracts.estilewrap} 
             estilepack={this.contracts.estilepack} 
-            user={this.accounts[0]} />
-          <SceneManager 
-            scenes={this.state.scenes}
-            user={this.accounts[0]} />
+            user={this.accounts[0]}
+          />
         </div>
       </div>
 		);

@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 var Web3 = require('web3');
 
+
+const imgUri = (id) => {
+  const strId = id.toString(16).padStart(64, 0);
+  return "https://raw.githubusercontent.com/EtherScapes/metadata/master/pack/"+strId+".png";
+}
+
+
 const PackStore = (props) => {
-  const buyPack = async (p, count=1) => {
+  const buyPackETH = async (p, count=1) => {
     let packCost = Web3.utils.toWei("0.1", "ether");
     await props.estilewrap.buyPacksForETH(p, count, {
       value: packCost * count, 
+      from: props.user
+    });
+  }
+
+  const buyPackEscape = async (p, cost, count=1) => {
+    await props.estilewrap.buyPacksForCredits(p, count, {
       from: props.user
     });
   }
@@ -19,26 +32,42 @@ const PackStore = (props) => {
     const packId = i + 1;
     return (
       <div key={packId} className="PackStore-pack">
-        <div>sceneId = {pack.sceneId}</div>
-        <div>escapeCost = {pack.escapeCost}</div>
-        <div>isPurchaseable = {pack.isPurchaseable?"Y":"N"}</div>
-        <div>tilesPerPack = {pack.tilesPerPack}</div>
-        <div>maxQuant = {pack.maxQuant}</div>
-        <div>packsLeft = {pack.packsLeft}</div>
-        {pack.isPurchaseable && pack.packsLeft > 0 && 
-          <div onClick={() => {buyPack(packId, 1);}}>BUY 0.1 ETH</div>
-        }
-        <div>
-          You own {pack.balance} packs.
-          {pack.balance > 0 && <span onClick={()=>{openPack(packId, 1);}}>open?</span>}
+        <div className="col">
+          <div>scene #{pack.sceneId}</div>
+          <div>{pack.packsLeft} / {pack.maxQuant} left</div>
         </div>
+        <br></br>
+        <div className="pack">
+          <img src={imgUri(packId)} alt={packId+1}/>
+          <div className="col">
+            <div className="col">
+              <div></div>
+              <div className="float">{pack.tilesPerPack} x <span role="img" aria-label="puzzle">🧩</span></div>
+            </div>
+          </div>    
+        </div>
+        <br></br>
+        <div className="col">
+          <div>Buy: </div>
+          <div className="button" onClick={() => {buyPackEscape(packId, pack.escapeCost, 1);}}>{pack.escapeCost} ESC</div>
+          {pack.isPurchaseable && pack.packsLeft > 0 && 
+            <div className="button" onClick={() => {buyPackETH(packId, 1);}}>0.1 ETH</div>}
+        </div>
+        <br></br>
+        {pack.balance <= 0 && <div>You own no packs.</div>}
+        {pack.balance > 0 && 
+          <div className="col">
+            <div>x{pack.balance}</div>
+            <div className="button" onClick={()=>{openPack(packId, 1);}}>open pack</div>
+            <div className="button" onClick={()=>{openPack(packId, pack.balance);}}>open all ({pack.balance})</div>
+          </div>}
       </div>
     );
   });
 
   return (
     <div className="PackStore-main">
-      <h4>EtherScapes tile packs for sale: [{props.user}]</h4>
+      <br></br>
       <div className="PackStore-list">
         {packs}
       </div>
