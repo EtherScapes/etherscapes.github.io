@@ -10,6 +10,7 @@ const getShardInfo = async (id) => {
 }
 
 const Shard = (props) => {
+  console.log("SHARD PROPS");
   console.log(props);
   let {id} = useParams();
   const tokId = parseInt(id, 16);
