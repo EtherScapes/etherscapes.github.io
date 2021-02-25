@@ -1,5 +1,5 @@
 
-const prettyfyId = (strId) => {
+export const prettyfyId = (strId) => {
   let s = "0x";
   let zs = strId.length;
   let ze = 0;
@@ -20,30 +20,32 @@ const prettyfyId = (strId) => {
   return s;
 }
 
-const nftId = (id) => {
+export const nftId = (id) => {
   return id.toString(16).padStart(64, 0);
 }
 
-const tileImgUri = (id, useBW=false) => {
+export const tileImgUri = (id, useBW=false) => {
   if (useBW) {
     return "https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/"+nftId(id)+"_bw.png"
   }
   return "https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/"+nftId(id)+".png";
 }
 
-const tileDataUri = (id) => {
+export const tileDataUri = (id) => {
   return "https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/"+nftId(id)+".json";
 }
 
-const packImgUri = (id) => {
+export const packImgUri = (id) => {
   return "https://raw.githubusercontent.com/EtherScapes/metadata/master/pack/"+nftId(id)+".png";
 }
 
-const packGifUri = (id) => {
+export const packGifUri = (id) => {
   return "https://raw.githubusercontent.com/EtherScapes/metadata/master/pack/"+nftId(id)+".gif";
 }
 
-const getAllSceneInfo = async (estile, user, numScenes) => {
+////////////////////////////////////////////////////////////////////////////////
+
+export const getAllSceneInfo = async (estile, user, numScenes) => {
   /*
    *  All pack token ids start at 1, query stats for each one so we know how 
    *  many are left, if they can be purchased and our personal count for them.
@@ -59,7 +61,7 @@ const getAllSceneInfo = async (estile, user, numScenes) => {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const getTokenBalance = async (estile, user, tokenId) => {
+export const getTokenBalance = async (estile, user, tokenId) => {
   const _b = await estile.balanceOf(user, tokenId);
   const _t = await estile.totalSupply(tokenId);
   return {
@@ -73,7 +75,7 @@ const getTokenBalance = async (estile, user, tokenId) => {
  *  and compute their balances so that the renderer can fetch the needed
  *  metadata and render our website correctly.
  */
-const getSceneInfo = async (estile, user, sceneId) => {
+export const getSceneInfo = async (estile, user, sceneId) => {
   const _tokRange = await estile.tokenRangeForScene(sceneId);
   const tilesPerPuzzle = _tokRange[1].toNumber();
   const numPuzzles = _tokRange[2].toNumber();
@@ -131,16 +133,16 @@ const getSceneInfo = async (estile, user, sceneId) => {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = {
-  nftId: nftId,
-  prettyfyId: prettyfyId,
-  tileImgUri: tileImgUri,
-  tileDataUri: tileDataUri,
-  packImgUri: packImgUri,
-  packGifUri: packGifUri,
-  getSceneInfo: getSceneInfo,
-  getAllSceneInfo: getAllSceneInfo,
-  getTokenBalance: getTokenBalance,
-};
+// export default {
+//   nftId,
+//   prettyfyId,
+//   tileImgUri,
+//   tileDataUri,
+//   packImgUri,
+//   packGifUri,
+//   getSceneInfo,
+//   getAllSceneInfo,
+//   getTokenBalance,
+// };
 
 ////////////////////////////////////////////////////////////////////////////////

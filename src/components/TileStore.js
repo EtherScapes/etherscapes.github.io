@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {packImgUri, packGifUri, getSceneInfo, getAllSceneInfo} from "./contractHelpers.js";
+import {packImgUri, packGifUri, getAllSceneInfo, getSceneInfo } from "./contractHelpers.js";
 
 var Web3 = require("web3");
 

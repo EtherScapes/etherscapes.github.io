@@ -8,7 +8,9 @@ deploy-init:
 	npm run deploy
 
 build:
-	npm run build
+	GENERATE_SOURCEMAP=false npm run build
 
 deploy:
 	git push origin `git subtree split --prefix build master`:gh-pages --force
+
+.PHONY: build
