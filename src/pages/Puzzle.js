@@ -10,7 +10,6 @@ const getShardInfo = async (id) => {
 }
 
 const Puzzle = (props) => {
-  console.log(props);
   let {id} = useParams();
   const tokId = parseInt(id, 16);
 
@@ -18,7 +17,7 @@ const Puzzle = (props) => {
   const [desc, setDesc] = useState();
   const [tokInfo, setTokInfo] = useState();
 
-  if (!desc) {
+  if (!desc && props.user && props.estile) {
     getShardInfo(id)
       .then(setDesc);
   }
