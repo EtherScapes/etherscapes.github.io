@@ -37,7 +37,7 @@ const Puzzle = (props) => {
       {desc === undefined && 
         <div>Loading metadata...</div>
       }
-      {desc &&
+      {desc && props.estile &&
         <>
           <div className="col">
             <div>Name</div>
