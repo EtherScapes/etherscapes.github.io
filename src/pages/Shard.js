@@ -1,7 +1,9 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 
-import {tileDataUri, tileImgUri, prettyfyId, getTokenBalance} from "../components/contractHelpers.js";
+import {tileDataUri, tileImgUri, nftId, prettyfyId, getTokenBalance} from "../components/contractHelpers.js";
+
+import OpenSeaLogo from '../svg/opensea-logo.svg';
 
 const getShardInfo = async (id) => {
   const tileJSON = tileDataUri(id);
@@ -9,9 +11,50 @@ const getShardInfo = async (id) => {
   return await rsp.json();
 }
 
-const Shard = (props) => {
-  console.log("SHARD PROPS");
-  console.log(props);
+export const ShardInner = (props) => {
+  const tokId = parseInt(props.id, 16);
+  const prettyId = prettyfyId(nftId(props.id));
+  console.log(tokId, prettyId, props.id);
+  return (
+    <div className="Shard-main">
+      {props.name && props.estile && 
+        <div className="shard-header">
+          {props.name}
+          <span className="grow" />
+          {props.estile && 
+            <a href={"https://testnets.opensea.io/assets/"+props.estile.address+"/"+tokId}>
+              <img src={OpenSeaLogo} alt="OpenSea" />
+            </a>
+          }
+        </div>
+      }
+      <div className="bg">
+        <img src={tileImgUri(props.id)} alt={props.id} />
+      </div>
+      <div className="col">
+        <div>Token ID</div>
+        <div>{prettyId}</div>
+      </div>
+      {!props.balance || !props.supply && 
+        <div>Loading balances...</div>
+      }
+      {props.balance && props.supply &&
+        <>
+          <div className="col">
+            <div>Your balance</div>
+            <div>{props.balance}</div>
+          </div>
+          <div className="col">
+            <div>Total supply</div>
+            <div>{props.supply}</div>
+          </div>
+        </>
+      }
+    </div>
+  );
+}
+
+export const Shard = (props) => {
   let {id} = useParams();
   const tokId = parseInt(id, 16);
   const prettyId = prettyfyId(id);
@@ -27,42 +70,12 @@ const Shard = (props) => {
       .then(setTokInfo);
   }
   return (
-    <div className="Shard-main">
-      <div className="bg">
-        <img src={tileImgUri(id)} alt={id} />
-      </div>
-      <div className="col">
-        <div>Token ID</div>
-        <div>{prettyId}</div>
-      </div>
-      {desc === undefined && 
-        <div>Loading metadata...</div>
-      }
-      {desc && props.estile &&
-        <>
-          <div className="col">
-            <div>Name</div>
-            <div>{desc.name}</div>
-          </div>
-          <a href={"https://testnets.opensea.io/assets/"+props.estile.address+"/"+tokId}>View in OpenSEA</a>
-        </>
-      }
-      {tokInfo === undefined && 
-        <div>Loading balances...</div>
-      }
-      {tokInfo &&
-        <>
-          <div className="col">
-            <div>Your balance</div>
-            <div>{tokInfo.balance.toString()}</div>
-          </div>
-          <div className="col">
-            <div>Total supply</div>
-            <div>{tokInfo.supply.toString()}</div>
-          </div>
-        </>
-      }
-    </div>
+    <ShardInner
+      {...props}
+      name={(desc && desc.name) || "loading ..."}
+      id={id}
+      balance={(tokInfo && tokInfo.balance.toString()) || "loading ..."}
+      supply={(tokInfo && tokInfo.supply.toString()) || "loading ..."} />
   );
 }
 

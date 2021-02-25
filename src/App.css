@@ -10,12 +10,18 @@
 }
 
 html, body {
+  --color-font: #e8ffee;
+  --color-special: #78db97;
+  --color-background: #5c5b77;
+  --color-header: #2d293d;
+  --color-header-alpha: #e8ffee60;
+  
   margin: 0;
   padding: 0;
   height: 100%;
 
-  color: black;
-  background: white;
+  color: var(--color-font);
+  background: var(--color-background);
   font-family: EtherScapesFont;
 }
 
@@ -24,6 +30,32 @@ html, body {
   display: flex;
   flex-direction: column;
 }
+
+/* #root level sibling for modal popups. */
+#modal {
+  position: absolute;
+  z-index: 999;
+}
+/* conditionally displayed item, blank screen, fullscreen etc. */
+.modal {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: -100vh;
+  left: 0;
+  display: flex;
+  background-color: #000000D0;
+  justify-content: center;
+  align-items: center;
+}
+/* modal body container */
+.modal-body {
+  max-width: 70%;
+  height: auto;
+  padding: 20px;
+  background-color: var(--color-background);
+}
+
 .App {
   display: flex;
   flex: 1;
@@ -47,8 +79,11 @@ html, body {
 }
 .underline {
   padding-bottom: 5px;
-  border-bottom: 2px solid #424242;
+  border-bottom: 2px solid var(--color-header);
   margin-bottom: 5px;
+}
+.spacer {
+  width: 30px;
 }
 
 /*
@@ -58,135 +93,138 @@ html, body {
   display: flex;
   flex-direction: row;
   height: 50px;
-  background-color: #3d3d3d;
+  background-color: var(--color-header);
   justify-content: flex-start;
   align-items: center;
 }
+
+.link,
 .App-header a {
   margin: 20px;
-  color: #cdcdcd;
+  color: var(--color-font);
   cursor: pointer;
   text-decoration: none;
 }
 .App-header a:visited {
-  color: #cdcdcd;
+  color: var(--color-font);
+}
+
+.link, .link:visited {
+  color: var(--color-special);
 }
 
 .App-header a.isActive,
 .App-header a:hover {
-  color: #cdcd3d;
+  color: var(--color-special);
 }
 .App-header .balance {
-  color: #cdcdcd;
+  color: var(--color-font);
   margin-right: 20px;
 }
 
-/******************************************************************************/
 /*
- *  Packs 
+ *  Body spans rest of space.
  */
-.Packs-main {
-  margin: 0px 5% 0px 5%;
+.App-body {
+  height: calc(100vh - 50px);
+  display: flex;
+  justify-content: center;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
-.TileStore-list {
+
+/******************************************************************************/
+ 
+/*
+ *  Home
+ */
+.Home-main {
+  height: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  
+  display: flex;
+  flex-direction: column;
+}
+.Home-main>.title {
+  margin-top: 30px;
+  width: 100%;
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 13pt;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
- }
-.TileStore-pack {
-  margin: 20px;
-  padding: 10px;
 }
-.TileStore-pack .col div:first-child {
-  flex-grow: 1;
-}
-.TileStore-pack img {
-  width: 320px;
-  min-height: 180px;
-}
-.TileStore-pack .pack {
-  padding: 8px;
-  background:#ecc60d;
-  border: solid 1px #222222;
-
-  box-shadow: 1px 0px 0px #999999,0px 1px 0px #999999,
-              2px 1px 0px #444444,1px 2px 0px #444444,
-              3px 2px 0px #222222,2px 3px 0px #222222,
-              4px 3px 0px #999999,3px 4px 0px #999999,
-              5px 4px 0px #444444,4px 5px 0px #444444,
-              6px 5px 0px #222222,5px 6px 0px #222222,
-              7px 6px 0px #999999,6px 7px 0px #999999,
-              8px 7px 0px #444444,7px 8px 0px #444444,
-              9px 8px 0px #222222,8px 9px 0px #222222;
-}
-
-.TileStore-pack .button {
+.Home-main>.title span {
   margin: 5px;
-  padding: 5px;
-  cursor: pointer;
-
-  background:#03A9F4;
-  border: solid 1px #1976D2;
-
-  box-shadow: 
-    1px 0px 0px #444444,0px 1px 0px #444444,
-    2px 1px 0px #1976D2,1px 2px 0px #1976D2,
-    3px 2px 0px #444444,2px 3px 0px #444444;
-}
-
-.TileStore-pack .button:hover {
-  background:#ecc60d;
-  box-shadow: 
-    1px 0px 0px #444444,0px 1px 0px #444444,
-    2px 1px 0px #ecc60d,1px 2px 0px #ecc60d,
-    3px 2px 0px #444444,2px 3px 0px #444444;
-}
-
-.TileStore-pack .pack .col {
-  position: relative;
-  top: -12px;
-  height: 0;
-}
-.TileStore-pack .col {
-  justify-content: center;
-  align-items: center;
-  height: 30px;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-/******************************************************************************/
- /*
-  *  Home
-  */
-
-.canvas {
-  width: 80vw;
-  margin-top: 20px;
-  margin-left: 8vw;
-  border: 2vw solid black;
-  /* height: 100%; */
-  background-color: beige;
-}
-
-.Home-main h3 {
-  padding-left: 25px;
-}
-.Home-main h3 span {
-  margin: 5px;
-  cursor: pointer;
-  color: #03A9F4;
   user-select: none;
 }
-.Home-main h3 .spacer {
+.clickable {
+  cursor: pointer;
+  color: var(--color-special);
+}
+.Home-main>.title>span.invalid {
+  visibility: hidden;
+}
+.Home-main>.title .spacer {
   width: 50px;
+}
+
+.canvas {
+  width: 100%;
+  margin: 20px auto 0 auto;
+  border: 4px solid var(--color-header);
+  background-color: var(--color-header);
+}
+
+.rename-toolbar {
+
+}
+
+.puzzle-name {
+  color: var(--color-font);
+  font-size: 12pt;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  align-items: center;
+  
+  width: 100%;
+  text-align: center;
+  background: var(--color-header);
+  border: 4px solid var(--color-header);
+  padding-bottom: 7px;
+}
+.buy-tiles {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.buy-tiles img {
+  margin-top: 5px;
+  margin-right: 10px;
+  width: 32px;
+}
+
+.puzzle-author:before { content: "named by: "; }
+.puzzle-author {
+  margin-top: 10px;
+  margin-left: 10px;
+  color: var(--color-font); 
+  font-size: 12pt;
+  margin-left: 8vw;
+  width: 100%;
+  text-align: left;
 }
 
 .token-table {
   margin: 25px auto;
-  max-width: 80%;
+  max-width: 100%;
 }
 
 .token-table .th {
@@ -218,7 +256,11 @@ html, body {
 .token-table .th>div:nth-child(4) {
   flex: 5;
 }
-
+.token-table .th img {
+  padding: 5px;
+  background-color: var(--color-header-alpha);
+  border: 1px solid var(--color-header);
+}
 /******************************************************************************/
 
 .About-main {
@@ -230,15 +272,6 @@ html, body {
 }
 
 
-.static {
-  position: absolute;
-  background: white;
-}
-
-.static:hover {
-  opacity: 0;
-}
-
 /******************************************************************************/
 
 .Shard-main {
@@ -247,18 +280,39 @@ html, body {
   min-width: 400px;
   max-width: 90%;
   margin: 0 auto;
+
+  /* padding: 30px; */
+  /* border: 1px solid white; */
+}
+
+.shard-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .Shard-main .bg {
-  background-color: black;
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 50%;
+  max-width: 60%;
   margin: 0 auto;
 }
 
 .Shard-main .bg>img {
   padding: 20px;
-  max-width: 320px;
+  max-width: 420px;
+  height: auto;
+  padding: 12px;
+  background-color: var(--color-header);
+}
+
+/******************************************************************************/
+
+a>img {
+  width: 30px;
+  height: 30px;
 }

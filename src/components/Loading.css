@@ -1,0 +1,63 @@
+
+
+/*
+ *  Loading component css.
+ */
+
+ .App-loading {
+    min-width: 50%;
+    max-width: 500px;
+    margin: 0 auto;
+    color: var(--color-font);
+  
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 14pt;
+  }
+  
+  .loading-animation {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 50px;
+  }
+  .loading-animation div {
+    position: absolute;
+    top: 30px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-font);
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  }
+  .loading-animation div:nth-child(1) {
+    left: 8px;
+    animation: loading-animation1 0.6s infinite;
+  }
+  .loading-animation div:nth-child(2) {
+    left: 8px;
+    animation: loading-animation2 0.6s infinite;
+  }
+  .loading-animation div:nth-child(3) {
+    left: 24px;
+    animation: loading-animation2 0.6s infinite;
+  }
+  .loading-animation div:nth-child(4) {
+    left: 40px;
+    animation: loading-animation3 0.6s infinite;
+  }
+  @keyframes loading-animation1 {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+  @keyframes loading-animation3 {
+    0% { transform: scale(1); }
+    100% { transform: scale(0); }
+  }
+  @keyframes loading-animation2 {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(16px, 0); }
+  }
+  

@@ -1,0 +1,136 @@
+
+/*
+ *  Packs 
+ */
+.Packs-main {
+  margin: 0px 5% 0px 5%;
+  width: 100%;
+}
+.TileStore-main {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.TileStore-blurb {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+  min-width: 420px;
+  margin: 20px 0px;
+  padding: 20px 30px 30px 30px;
+  background-color: var(--color-header);
+  color: var(--color-font);
+}
+.TileStore-blurb>div {
+  display: flex;
+  flex-direction: column;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+.TileStore-blurb>div>img {
+  width: 80px;
+  height: 80px;
+  margin: 10px auto;
+}
+.TileStore-blurb p {
+  width: 100%;
+  margin: 10px
+}
+
+.TileStore-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.TileStore-pack {
+  margin: 0 10px 10px 10px;
+  padding: 10px;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.scene-list {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.pack-holder {
+  flex-grow: 1;
+  border-radius: 100% 0 0 100%;
+  background: var(--color-header);
+}
+
+.TileStore-pack .col div:first-child {
+  flex-grow: 1;
+}
+.TileStore-pack .pack {
+    padding: 8px;
+    position: relative;
+    cursor: pointer;
+    /* background: var(--color-special); */
+    border: solid 8px var(--color-header);
+    border-radius: 100%;
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+}
+.pack>img {
+  width: 108%;
+  height: 108%;
+  position: absolute;
+  top: -14px;
+  left: -4px;
+}
+.static {
+  position: relative;
+  z-index: 1;
+}
+.active {
+  z-index: 0;
+}
+.static:hover {
+  opacity: 0;
+}
+
+
+.TileStore-pack .pack .col {
+  position: relative;
+  top: -12px;
+  height: 0;
+}
+
+.TileStore-pack .col {
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.scene-details {
+  padding-right: 30px;
+  padding-left: 30px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: inherit;
+  justify-content: space-evenly;
+  background: var(--color-header);
+}
+.scene-details>.buy-tiles {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+.scene-details>.buy-tiles>img {
+  margin-right: 8px;
+}
+

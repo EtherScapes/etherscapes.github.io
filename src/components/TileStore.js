@@ -1,12 +1,32 @@
 import React, {useState} from "react";
+import { useHistory } from "react-router";
 
+import {Loading} from "./Loading.js";
 import {packImgUri, packGifUri, getAllSceneInfo, getSceneInfo } from "./contractHelpers.js";
+import {BuyTilesModal} from "./Overlays.js";
 
-var Web3 = require("web3");
+import "./TileStore.css";
+
+import CollectSVG from "../svg/collect.svg";
+import SolveSVG from "../svg/puzzle.svg";
+import EarnSVG from "../svg/salary.svg";
+import BuySVG from "../svg/buy.svg";
+
+////////////////////////////////////////////////////////////////////////////////
 
 const TileStore = (props) => {
+  const history = useHistory();
   const [isLoading, setLoading] = useState(true);
   const [scenes, setScenes] = useState([]);
+  const [buyTilesForSceneId, setBuyTilesForSceneId] = useState(0);
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  const gotoScene = (sid, pid) => {
+    history.push("/scene/" + sid + "/puzzle/" + (pid+1));
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
 
   const updateSceneInfo = async (sidx) => {
     let desc = await getSceneInfo(props.estile, props.user, sidx);
@@ -24,83 +44,84 @@ const TileStore = (props) => {
       setScenes(...scenes, desc);
     }
   }
-
-  const buyTilesETH = async (sceneId, count=10) => {
-    let cost = Web3.utils.toWei("0.02", "ether");
-    await props.estilewrap.buyTilesForETH(sceneId, count, {
-      value: cost * count, 
-      from: props.user
-    }).catch((err) => {
-      console.log("Something went wrong,", err);
-    });
-    await updateSceneInfo(sceneId);
-  }
-
-  const buyTilesEscape = async (sceneId, cost, count=1) => {
-    await props.estilewrap.buyTilesForEscape(sceneId, count, {
-      from: props.user
-    }).catch((err) => {
-      console.log("Something went wrong,", err);
-    });
-    await updateSceneInfo(sceneId);
-  }
   
+  //////////////////////////////////////////////////////////////////////////////
+
+  if (!props.estile || !props.user) {
+    return <Loading message="Talking to contract" />;
+  }
+
   if (props.estile && props.user && props.numScenes && isLoading) {
-    setLoading(false);
     getAllSceneInfo(props.estile, props.user, props.numScenes.toNumber())
       .then((_scenes) => {
         setScenes(_scenes)
+        setLoading(false);
       });
-    return <div>Loading ...</div>;
+    return <Loading message="Loading scenes" />;
   } 
 
+  //////////////////////////////////////////////////////////////////////////////
+
   const scenesDOM = scenes.map((scene, i) => {
-    console.log(scene, i);
     const sceneId = scene.sceneId;
     return (
       <div key={sceneId} className="TileStore-pack">
-        <div className="col">
-          <div>scene #{scene.sceneId}</div>
-          <div>{scene.tilesLeft.toString()} tiles left</div>
-        </div>
-        <br></br>
-        <div className="pack">
-          <img className="static" src={packImgUri(sceneId)} alt={sceneId} />
-          <img className="active" src={packGifUri(sceneId)} alt={sceneId} />
-          <div className="col">
-            <div className="col">
-              <div></div>
-              <div className="float">{scene.tilesLeft.toString()} x <span role="img" aria-label="puzzle">🧩</span></div>
+        <div className="scene-list">
+          <div className="pack-holder">
+            <div className="pack" onClick={()=>{gotoScene(1, 0)}}>
+              <img className="static" src={packImgUri(sceneId)} alt={sceneId} />
+              <img className="active" src={packGifUri(sceneId)} alt={sceneId} />
             </div>
-          </div>    
+          </div>
+          <div className="scene-details">
+            <div className="col">
+              <div>rift #{scene.sceneId}</div>
+              <div>{scene.tilesLeft.toString()} tiles left</div>
+            </div>
+            <div className="buy-tiles clickable" onClick={()=>{setBuyTilesForSceneId(sceneId)}}>
+              <img src={BuySVG} alt="buy shards"></img> buy shards
+            </div>
+          </div>
         </div>
-        <br></br>
-        <div className="col">
-          <div>Buy tiles: </div>
-          <div className="button" onClick={() => {buyTilesEscape(sceneId, 5, 1);}}>{5} ESC</div>
-          {scene.tilesLeft.toNumber() > 0 && 
-            <div className="button" onClick={() => {buyTilesETH(sceneId, 10);}}>0.02 ETH</div>}
-        </div>
-        <br></br>
-        {/* {pack.balance <= 0 && <div>You own no packs.</div>}
-        {pack.balance > 0 && 
-          <div className="col">
-            <div>x{pack.balance}</div>
-            <div className="button" onClick={()=>{openPack(sceneId, 1);}}>open pack</div>
-            <div className="button" onClick={()=>{openPack(sceneId, pack.balance);}}>open all ({pack.balance})</div>
-          </div>} */}
       </div>
     );
   });
 
   return (
     <div className="TileStore-main">
+      <BuyTilesModal
+        {...props} 
+        sceneId={buyTilesForSceneId}
+        updateSceneInfo={updateSceneInfo} 
+        close={() => {setBuyTilesForSceneId(0)}} />
+      <div className="TileStore-blurb">
+        <div>
+          <img src={CollectSVG} alt="collect" />
+          <div>collect shards</div>
+        </div>
+        <div>
+          <img src={SolveSVG} alt="solve" />
+          <div>solve puzzles</div>
+        </div>
+        <div>
+          <img src={EarnSVG} alt="earn" />
+          <div>earn ESCAPE</div>
+        </div>
+      </div>
+      <div className="TileStore-blurb">
+        <p>1. Use ESCAPE to buy shards from any scene.</p>
+        <p>2. Use ESCAPE to set the name of a solved puzzle.</p>
+        <p>3. New rifts drop every month!</p>
+      </div>
       <br></br>
       <div className="TileStore-list">
+        <h4>Open rifts</h4>
         {scenesDOM}
       </div>
     </div>
   );
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 export default TileStore;

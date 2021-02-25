@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect} from "react";
 import {useHistory} from "react-router-dom";
 
+import {Loading} from "../components/Loading.js";
 import {getSceneInfo, nftId, prettyfyId, tileImgUri, tileDataUri} from "../components/contractHelpers.js";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,26 +22,19 @@ const Home = (props) => {
       });
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-
   const gotoScene = (sid, pid) => {
     history.push("/scene/" + sid + "/puzzle/" + (pid+1));
   }
 
   //////////////////////////////////////////////////////////////////////////////
 
+  if (loading) return <Loading message="Talking to the contract" />;
+
   return (
     <div className="Home-main">
-      {loading && 
-        <div>Talking to the contract ...</div>
-      }
-      {!loading && 
-        <>
-          <h3>EtherScapes</h3>
-          <div onClick={()=>{gotoScene(1, 0)}}>Explore Scene 1</div>
-          <div onClick={()=>{history.push("/packs")}}>Purchase tiles today!</div>
-        </>
-      }
+      <h3>EtherScapes</h3>
+      <div onClick={()=>{gotoScene(1, 0)}}>Explore Scene 1</div>
+      <div onClick={()=>{history.push("/packs")}}>Purchase tiles today!</div>
     </div>
   );
 }

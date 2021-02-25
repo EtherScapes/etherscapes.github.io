@@ -141,7 +141,7 @@ class App extends Component {
      *  in each scene. If we have tokens that correspond to a scene, we list 
      *  them here.
      */
-    let numScenes = await this.contracts.estile.sceneCount();
+    let numScenes = await estile.sceneCount();
 
     /*
      *  Update app state!
@@ -202,8 +202,7 @@ class App extends Component {
       <div className="App">
         <div className="App-header">
           <NavLink exact activeClassName="isActive" to="/">EtherScapes</NavLink>
-          <NavLink exact activeClassName="isActive" to="/packs">Packs</NavLink>
-          <NavLink exact activeClassName="isActive" to="/about">About</NavLink>
+          <NavLink exact activeClassName="isActive" to="/about">FAQ</NavLink>
           <div className="grow"></div>
           <div className="balance">{this.state.escapeBalance.toString()} ESC</div>
           <div className="balance" onClick={()=> {this.claimReward()}}>({this.state.escapeClaimable.toString()}, +{this.state.numClaims.toString()} per day)</div>

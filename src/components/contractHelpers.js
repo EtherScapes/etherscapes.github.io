@@ -52,12 +52,27 @@ export const getAllSceneInfo = async (estile, user, numScenes) => {
    * 
    *  The `TileStore` component is how we open / purchase / see our packs.
    */
-  let packs = [];
+  let scenes = [];
   for (var sidx = 1; sidx <= numScenes; sidx++) {
-    packs.push(await getSceneInfo(estile, user, sidx));
+    scenes.push(await getSceneInfo(estile, user, sidx));
   }
-  return packs;
+  return scenes;
 }
+
+
+export const getAllSceneSaleInfo = async (estile, user, numScenes) => {
+    /*
+     *  All pack token ids start at 1, query stats for each one so we know how 
+     *  many are left, if they can be purchased and our personal count for them.
+     * 
+     *  The `TileStore` component is how we open / purchase / see our scenes.
+     */
+    let scenes = [];
+    for (var sidx = 1; sidx <= numScenes; sidx++) {
+      scenes.push(await getSceneSaleInfo(estile, user, sidx));
+    }
+    return scenes;
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -80,7 +95,6 @@ export const getSceneInfo = async (estile, user, sceneId) => {
   const tilesPerPuzzle = _tokRange[1].toNumber();
   const numPuzzles = _tokRange[2].toNumber();
   const numTiles = tilesPerPuzzle * numPuzzles;
-
   const _tilesLeft = await estile.sceneTilesLeft(sceneId);
   
   // Ranges for the tokens in this scene. 
@@ -88,30 +102,6 @@ export const getSceneInfo = async (estile, user, sceneId) => {
   const end_tile_range = start_tile_range + numTiles - 1;
   const start_puzzle_range = end_tile_range + 1;
   const end_puzzle_range = start_puzzle_range + numPuzzles - 1;
-  
-  let tileTokenBalances = [];
-  let tileTokenTotalBalances = [];
-  for (var ttok = start_tile_range; ttok <= end_tile_range; ttok++) {
-    const tokInfo = await getTokenBalance(estile, user, ttok);
-    tileTokenBalances.push(tokInfo.balance.toNumber());
-    tileTokenTotalBalances.push(tokInfo.supply.toNumber());
-  }
-  
-  let puzzleTokenBalances = [];
-  let puzzleTokenTotalBalances = [];
-  let puzzleRedeemable = [];
-  let balOffset = 0;
-  for (var ptok = start_puzzle_range; ptok <= end_puzzle_range; ptok++) {
-    const tokInfo = await getTokenBalance(estile, user, ptok);
-    puzzleTokenBalances.push(tokInfo.balance.toNumber());
-    puzzleTokenTotalBalances.push(tokInfo.supply.toNumber());
-    let canRedeem = true;
-    for (var i = 0; i < tilesPerPuzzle; i++) {
-      if (tileTokenBalances[balOffset] <= 0) canRedeem = false;
-      balOffset += 1;
-    }
-    puzzleRedeemable.push(canRedeem);
-  }
 
   return {
     sceneId: sceneId,
@@ -123,26 +113,60 @@ export const getSceneInfo = async (estile, user, sceneId) => {
     tilesLeft: _tilesLeft,
     numPuzzles: numPuzzles,
     tilesPerPuzzle: tilesPerPuzzle,
-    tileTokenBalances: tileTokenBalances,
-    tileTokenTotalBalances: tileTokenTotalBalances,
-    puzzleTokenBalances: puzzleTokenBalances,
-    puzzleTokenTotalBalances: puzzleTokenTotalBalances,
-    puzzleRedeemable: puzzleRedeemable,
   };
 }
 
-////////////////////////////////////////////////////////////////////////////////
+export const getPuzzleTokensAndBalances = async (estile, user, sceneId, puzzleId) => {
+  const _tokRange = await estile.tokenRangeForScene(sceneId);
+  const tilesPerPuzzle = _tokRange[1].toNumber();
+  const numPuzzles = _tokRange[2].toNumber();
+  const numTiles = tilesPerPuzzle * numPuzzles;
 
-// export default {
-//   nftId,
-//   prettyfyId,
-//   tileImgUri,
-//   tileDataUri,
-//   packImgUri,
-//   packGifUri,
-//   getSceneInfo,
-//   getAllSceneInfo,
-//   getTokenBalance,
-// };
+  // Ranges for the tokens in this scene. 
+  const start_tile_range = _tokRange[0].toNumber() + (puzzleId * tilesPerPuzzle);
+  const end_tile_range = start_tile_range + tilesPerPuzzle - 1;
+  const puzzleToken = start_tile_range + (numTiles);
+  
+  let tileTokenBalances = [];
+  let tileTokenTotalBalances = [];
+  for (var ttok = start_tile_range; ttok <= end_tile_range; ttok++) {
+    const tokInfo = await getTokenBalance(estile, user, ttok);
+    tileTokenBalances.push(tokInfo.balance.toNumber());
+    tileTokenTotalBalances.push(tokInfo.supply.toNumber());
+  }
+  
+  let puzzleTokenBalance;
+  let puzzleTokenTotalBalance;
+  const tokInfo = await getTokenBalance(estile, user, puzzleToken);
+  puzzleTokenBalance = tokInfo.balance.toNumber();
+  puzzleTokenTotalBalance = tokInfo.supply.toNumber();
+  let canRedeem = true;
+  for (var i = 0; i < tilesPerPuzzle; i++) {
+    if (tileTokenBalances[i] <= 0) canRedeem = false;
+  }
+
+  return {
+    sceneId: sceneId,
+    tileTokenBalances: tileTokenBalances,
+    tileTokenTotalBalances: tileTokenTotalBalances,
+    puzzleTokenBalance: puzzleTokenBalance,
+    puzzleTokenTotalBalance: puzzleTokenTotalBalance,
+    puzzleRedeemable: canRedeem,
+  };
+}
+
+export const getSceneSaleInfo = async (estile, user, sceneId) => {
+    const _tokRange = await estile.tokenRangeForScene(sceneId);
+    const tilesPerPuzzle = _tokRange[1];
+    const numPuzzles = _tokRange[2];
+    const tilesLeft = await estile.sceneTilesLeft(sceneId);
+  
+    return {
+      sceneId: sceneId,
+      tilesLeft: tilesLeft,
+      numPuzzles: numPuzzles,
+      tilesPerPuzzle: tilesPerPuzzle,
+    };
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
