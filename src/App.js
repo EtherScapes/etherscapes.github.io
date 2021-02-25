@@ -43,6 +43,11 @@ class App extends Component {
 
       // Number of solved puzzle tokens.
       numClaims: 0,
+
+      escape: undefined,
+      namer: undefined,
+      estile: undefined,
+      estilewrap: undefined,
     };
   }
 
@@ -100,24 +105,15 @@ class App extends Component {
     }
   }
 
-  getEscapeBalance = async () => {
-    return await this.contracts.escape.balanceOf(this.accounts[0]);
-  }
 
-  getEscapeClaimable = async () => {
-    return await this.contracts.estile.getClaimInfo({from: this.accounts[0]});
-  }
 
   claimReward = async () => {
-    return await this.contracts.estile.claimReward({from: this.accounts[0]});
-  }
-
-  getNumClaims = async () => {
-    return await this.contracts.estile.claimLength(this.accounts[0]);
+    return await this.state.estile.claimReward({from: this.accounts[0]});
   }
 
   instantiateContracts = async () => {
     const contract = require("@truffle/contract");
+    const user = this.accounts[0];
     
     this.contracts_abi.EscapeToken = contract(_EscapeToken);
     this.contracts_abi.ESTile = contract(_ESTile);
@@ -129,16 +125,16 @@ class App extends Component {
     this.contracts_abi.ESTileWrapper.setProvider(window.web3.currentProvider);
     this.contracts_abi.NamingContract.setProvider(window.web3.currentProvider);
 
-    this.contracts.escape = await this.contracts_abi.EscapeToken.deployed();
-    this.contracts.estile = await this.contracts_abi.ESTile.deployed();
-    this.contracts.estilewrap = await this.contracts_abi.ESTileWrapper.deployed();
-    this.contracts.namer = await this.contracts_abi.NamingContract.deployed();
+    let escape = await this.contracts_abi.EscapeToken.deployed();
+    let estile = await this.contracts_abi.ESTile.deployed();
+    let estilewrap = await this.contracts_abi.ESTileWrapper.deployed();
+    let namer = await this.contracts_abi.NamingContract.deployed();
 
-    await this.subscribeToEvents();    
+    await this.subscribeToEvents(estile);    
 
-    let escapeBalance = await this.getEscapeBalance();
-    let escapeClaimable = await this.getEscapeClaimable();
-    let numClaims = await this.getNumClaims();
+    let escapeBalance = await escape.balanceOf(user);
+    let escapeClaimable = await estile.getClaimInfo({from: user});
+    let numClaims = await estile.claimLength(user);
     
     /*
      *  Now we need to figure how many scenes there are and how many puzzles 
@@ -155,12 +151,17 @@ class App extends Component {
       numScenes: numScenes,
       escapeBalance: escapeBalance,
       escapeClaimable: escapeClaimable,
+
+      escape: escape,
+      estile: estile,
+      estilewrap: estilewrap,
+      namer: namer,
     });
   }
 
-  subscribeToEvents = async () => {
+  subscribeToEvents = async (estile) => {
     console.log("subscribe...");
-    this.contracts.estile.allEvents()
+    estile.allEvents()
       .on("data", (e) => {
         console.log(e);
       })
@@ -213,9 +214,10 @@ class App extends Component {
             claim={this.state.escapeClaimable}
             numScenes={this.state.numScenes}
             numPacks={this.state.numPacks}
-            estile={this.contracts.estile}
-            namer={this.contracts.namer}
-            estilewrap={this.contracts.estilewrap} 
+            escape={this.state.escape}
+            estile={this.state.estile}
+            namer={this.state.namer}
+            estilewrap={this.state.estilewrap} 
             user={this.accounts[0]}
           />
         </div>
