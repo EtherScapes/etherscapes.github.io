@@ -88,25 +88,25 @@ html, body {
 .Packs-main {
   margin: 0px 5% 0px 5%;
 }
-.PackStore-list {
+.TileStore-list {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
  }
-.PackStore-pack {
+.TileStore-pack {
   margin: 20px;
   padding: 10px;
 }
-.PackStore-pack .col div:first-child {
+.TileStore-pack .col div:first-child {
   flex-grow: 1;
 }
-.PackStore-pack img {
+.TileStore-pack img {
   width: 320px;
   min-height: 180px;
 }
-.PackStore-pack .pack {
+.TileStore-pack .pack {
   padding: 8px;
   background:#ecc60d;
   border: solid 1px #222222;
@@ -122,7 +122,7 @@ html, body {
               9px 8px 0px #222222,8px 9px 0px #222222;
 }
 
-.PackStore-pack .button {
+.TileStore-pack .button {
   margin: 5px;
   padding: 5px;
   cursor: pointer;
@@ -136,7 +136,7 @@ html, body {
     3px 2px 0px #444444,2px 3px 0px #444444;
 }
 
-.PackStore-pack .button:hover {
+.TileStore-pack .button:hover {
   background:#ecc60d;
   box-shadow: 
     1px 0px 0px #444444,0px 1px 0px #444444,
@@ -144,12 +144,12 @@ html, body {
     3px 2px 0px #444444,2px 3px 0px #444444;
 }
 
-.PackStore-pack .pack .col {
+.TileStore-pack .pack .col {
   position: relative;
   top: -12px;
   height: 0;
 }
-.PackStore-pack .col {
+.TileStore-pack .col {
   justify-content: center;
   align-items: center;
   height: 30px;
@@ -227,4 +227,38 @@ html, body {
   min-width: 400px;
   max-width: 90%;
   margin: 0 auto;
+}
+
+
+.static {
+  position: absolute;
+  background: white;
+}
+
+.static:hover {
+  opacity: 0;
+}
+
+/******************************************************************************/
+
+.Shard-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.Shard-main .bg {
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 50%;
+  margin: 0 auto;
+}
+
+.Shard-main .bg>img {
+  padding: 20px;
+  max-width: 320px;
 }
