@@ -13,19 +13,19 @@ const MainLayout = (props) => {
   return (
     <Switch> {/* The Switch decides which component to show based on the current URL.*/}
       <Route exact path="/">
-        <Home {...props}/>
+        <Home page="Home" {...props}/>
       </Route>
       <Route exact path="/scene/:sid/puzzle/:pid">
-        <PuzzleViewer {...props}/>
+        <PuzzleViewer page="PuzzleViewer" {...props}/>
       </Route>
       <Route exact path="/packs">
-        <Packs {...props}/>
+        <Packs page="Packs" {...props}/>
       </Route>
       <Route exact path="/shard/:id">
-        <Shard {...props}/>
+        <Shard page="Shard" {...props}/>
       </Route>
       <Route exact path="/puzzle/:id">
-        <Puzzle {...props}/>
+        <Puzzle page="Puzzle" {...props}/>
       </Route>
       <Route exact path="/about">
         <About></About>
