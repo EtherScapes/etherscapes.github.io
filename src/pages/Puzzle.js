@@ -10,9 +10,13 @@ const getShardInfo = async (id) => {
 }
 
 const Puzzle = (props) => {
+  console.log("PUZZLE PROPS")
   console.log(props)
-  console.log(props.estile)
-  console.log(props.estile.address)
+  if (props.estile) {
+    console.log(props.estile)
+    console.log(props.estile.address)
+  }
+
   let {id} = useParams();
   const tokId = parseInt(id, 16);
 
