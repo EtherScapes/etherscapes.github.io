@@ -6,13 +6,14 @@ import {ShardInner} from "../pages/Shard.js";
 ////////////////////////////////////////////////////////////////////////////////
 
 var Web3 = require("web3");
+const toBN = Web3.utils.toBN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 export const Modal = (props) => {
   return ReactDOM.createPortal(
-    <div className="modal">
-      <div className="modal-body">
+    <div className="modal" onClick={()=>{props.doClose && props.doClose()}}>
+      <div className="modal-body" onClick={(e)=>{e.stopPropagation()}}>
         {props.children}
       </div>
     </div>,
@@ -22,8 +23,8 @@ export const Modal = (props) => {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export const useInput = ({ type }) => {
-  const [value, setValue] = useState("");
+export const useInput = (type, def) => {
+  const [value, setValue] = useState(def);
   const input = <input value={value} 
                         onChange={e => setValue(e.target.value)} 
                         type={type} />;
@@ -38,18 +39,18 @@ export const useEscape = (onEscape) => {
       if (event.keyCode === 27) 
         onEscape();
       };
-      window.addEventListener('keydown', handleEsc);
+      window.addEventListener("keydown", handleEsc);
 
       return () => {
-        window.removeEventListener('keydown', handleEsc);
+        window.removeEventListener("keydown", handleEsc);
       };
-    }, []);
+    }, [onEscape]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 export const BuyTilesModal = (props) => {
-  const [numToBuy, numToBuyInput] = useInput(0);
+  const [numToBuy, numToBuyInput] = useInput("number", 1);
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -78,23 +79,32 @@ export const BuyTilesModal = (props) => {
   //////////////////////////////////////////////////////////////////////////////
 
   useEscape(() => props.close());
+  
+  const ethTileCost = toBN(Web3.utils.toWei("0.02", "ether").toString());
+  const escTileCost = toBN(Web3.utils.toWei("5", "wei").toString());
+  const bnNumToBuy = toBN(numToBuy.toString());
+  const ethCostWei = ethTileCost.mul(bnNumToBuy);
+  const escCost = (escTileCost.mul(bnNumToBuy)).toString();
+  const ethCost = Web3.utils.fromWei(ethCostWei, "ether").toString();
 
   return (
     <>
       {props.sceneId > 0 &&
-        <Modal>
+        <Modal doClose={()=>{props.close()}}>
           <div className="tilestore-modal">
-            <h1>Buying tiles for scene {props.sceneId}</h1>
+            <h1>Buying tiles for rift {props.sceneId}</h1>
             <br></br>
             <div className="col">
-              <div>Number of shards:</div>
-              {numToBuyInput}
+              <div>Number of shards to purchase:</div>
             </div> 
+            <div className="col input-div">
+              {numToBuyInput}
+            </div>
             <br></br>
             <div className="col">
-              <div className="clickable" onClick={() => {buyTilesEscape();}}>Use ESC</div>
+              <div className="clickable" onClick={() => {buyTilesEscape();}}>Use {escCost} ESC</div>
               <span className="spacer"></span>
-              <div className="clickable" onClick={() => {buyTilesETH();}}>Use ETH</div>
+              <div className="clickable" onClick={() => {buyTilesETH();}}>Use {ethCost} ETH</div>
               <div className="grow"></div>
               <div className="clickable" onClick={() => {props.close()}}>CLOSE</div>
             </div>
@@ -111,19 +121,12 @@ export const ShardPreviewModal = (props) => {
   
   useEscape(() => props.close());
 
-  // TODO: Look up balances based on tokenId similar to shard here.
-  console.log(props.tokenId);
   return (
     <>
       {props.tokenId > 0 &&
         <Modal>
           <div className="tilestore-modal">
-          <ShardInner
-            {...props}
-            name={props.name || "loading ..."}
-            id={props.tokenId}
-            balance={0}
-            supply={0} />
+            <ShardInner {...props} id={props.tokenId} />
             <br></br>
             <div className="col">
               <div className="grow"></div>

@@ -1,23 +1,31 @@
 {
   "files": {
-    "main.css": "/static/css/main.19c83fa8.chunk.css",
-    "main.js": "/static/js/main.c793ab85.chunk.js",
-    "main.js.map": "/static/js/main.c793ab85.chunk.js.map",
+    "main.css": "/static/css/main.3093f5a8.chunk.css",
+    "main.js": "/static/js/main.251f6911.chunk.js",
+    "main.js.map": "/static/js/main.251f6911.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.e0770c88.js",
     "runtime-main.js.map": "/static/js/runtime-main.e0770c88.js.map",
-    "static/js/2.b04a4211.chunk.js": "/static/js/2.b04a4211.chunk.js",
-    "static/js/2.b04a4211.chunk.js.map": "/static/js/2.b04a4211.chunk.js.map",
+    "static/js/2.68559303.chunk.js": "/static/js/2.68559303.chunk.js",
+    "static/js/2.68559303.chunk.js.map": "/static/js/2.68559303.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.d093b4cb5e12eb1e7f02fd6ec995f712.js": "/precache-manifest.d093b4cb5e12eb1e7f02fd6ec995f712.js",
+    "precache-manifest.72e32f6667a9e4aeef65040c740ecc3b.js": "/precache-manifest.72e32f6667a9e4aeef65040c740ecc3b.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.19c83fa8.chunk.css.map": "/static/css/main.19c83fa8.chunk.css.map",
-    "static/js/2.b04a4211.chunk.js.LICENSE.txt": "/static/js/2.b04a4211.chunk.js.LICENSE.txt",
-    "static/media/App.css": "/static/media/regular.2db009d8.ttf"
+    "static/css/main.3093f5a8.chunk.css.map": "/static/css/main.3093f5a8.chunk.css.map",
+    "static/js/2.68559303.chunk.js.LICENSE.txt": "/static/js/2.68559303.chunk.js.LICENSE.txt",
+    "static/media/buy.svg": "/static/media/buy.fcafa681.svg",
+    "static/media/collect.svg": "/static/media/collect.25b81051.svg",
+    "static/media/discord.svg": "/static/media/discord.e2217522.svg",
+    "static/media/github.svg": "/static/media/github.31145889.svg",
+    "static/media/opensea-logo.svg": "/static/media/opensea-logo.91c20fca.svg",
+    "static/media/puzzle.svg": "/static/media/puzzle.79cd76ae.svg",
+    "static/media/reddit.svg": "/static/media/reddit.1dee27c4.svg",
+    "static/media/App.css": "/static/media/regular.2db009d8.ttf",
+    "static/media/salary.svg": "/static/media/salary.c4c37578.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.e0770c88.js",
-    "static/js/2.b04a4211.chunk.js",
-    "static/css/main.19c83fa8.chunk.css",
-    "static/js/main.c793ab85.chunk.js"
+    "static/js/2.68559303.chunk.js",
+    "static/css/main.3093f5a8.chunk.css",
+    "static/js/main.251f6911.chunk.js"
   ]
 }

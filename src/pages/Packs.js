@@ -6,7 +6,7 @@ const Packs = (props) => {
   return (
     <>
       <div className="Packs-main">
-      <TileStore {...props} />
+        <TileStore {...props} />
       </div>
     </>
   );

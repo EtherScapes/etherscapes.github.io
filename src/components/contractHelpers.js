@@ -39,8 +39,8 @@ export const packImgUri = (id) => {
   return "https://raw.githubusercontent.com/EtherScapes/metadata/master/pack/"+nftId(id)+".png";
 }
 
-export const packGifUri = (id) => {
-  return "https://raw.githubusercontent.com/EtherScapes/metadata/master/pack/"+nftId(id)+".gif";
+export const packGifUri = () => {
+  return "https://raw.githubusercontent.com/EtherScapes/metadata/master/img/rift-seethru.gif";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ export const getSceneInfo = async (estile, user, sceneId) => {
   const tilesPerPuzzle = _tokRange[1].toNumber();
   const numPuzzles = _tokRange[2].toNumber();
   const numTiles = tilesPerPuzzle * numPuzzles;
-  const _tilesLeft = await estile.sceneTilesLeft(sceneId);
+  const _tileInfo = await estile.sceneShardInfo(sceneId);
   
   // Ranges for the tokens in this scene. 
   const start_tile_range = _tokRange[0].toNumber();
@@ -110,7 +110,9 @@ export const getSceneInfo = async (estile, user, sceneId) => {
     puzzleTokenStart: start_puzzle_range,
     puzzleTokenEnd: end_puzzle_range,
     numTiles: numTiles,
-    tilesLeft: _tilesLeft,
+    tilesLeft: _tileInfo[0],
+    ethCost: _tileInfo[1],
+    escCost: _tileInfo[2],
     numPuzzles: numPuzzles,
     tilesPerPuzzle: tilesPerPuzzle,
   };
@@ -159,7 +161,7 @@ export const getSceneSaleInfo = async (estile, user, sceneId) => {
     const _tokRange = await estile.tokenRangeForScene(sceneId);
     const tilesPerPuzzle = _tokRange[1];
     const numPuzzles = _tokRange[2];
-    const tilesLeft = await estile.sceneTilesLeft(sceneId);
+    const tilesLeft = await estile.sceneShardInfo(sceneId);
   
     return {
       sceneId: sceneId,

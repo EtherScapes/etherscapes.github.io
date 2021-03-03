@@ -21,7 +21,7 @@
   margin: 20px 0px;
   padding: 20px 30px 30px 30px;
   background-color: var(--color-header);
-  color: var(--color-font);
+  color: var(--color-special);
 }
 .TileStore-blurb>div {
   display: flex;
@@ -82,21 +82,32 @@
     overflow: hidden;
 }
 .pack>img {
-  width: 108%;
-  height: 108%;
+  width: 128%;
+  height: 128%;
   position: absolute;
-  top: -14px;
-  left: -4px;
+  top: -20px;
+  left: -25px;
 }
 .static {
   position: relative;
-  z-index: 1;
-}
-.active {
-  z-index: 0;
+  z-index: 3;
 }
 .static:hover {
   opacity: 0;
+}
+.active {
+  z-index: 2;
+}
+.pack>.bg {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  font-size: 32pt;
+  display: flex;
+  color: var(--color-font);
+  background-color: black;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -124,13 +135,37 @@
   justify-content: space-evenly;
   background: var(--color-header);
 }
-.scene-details>.buy-tiles {
+.scene-details>.col>.buy-tiles {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
 }
-.scene-details>.buy-tiles>img {
+.scene-details>.col>.buy-tiles>img {
   margin-right: 8px;
+  width: 42px;
 }
 
+.tilestore-modal>div {
+  width: 100%;
+  display: flex;
+  margin-top: 20px;
+}
+.tilestore-modal>.input-div {
+  justify-content: center;
+}
+.tilestore-modal input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-header);
+  font-size: 14pt;
+  align-self: center;
+  color: var(--color-special);
+  width: 60px;
+  text-align: center;
+}
+.tilestore-modal input:focus {
+  border: none;	
+  outline: none;
+  border-bottom:1px solid var(--color-special);	
+}

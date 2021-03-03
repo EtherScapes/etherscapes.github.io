@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 
+import {Loading} from "../components/Loading.js";
 import {tileDataUri, tileImgUri, nftId, prettyfyId, getTokenBalance} from "../components/contractHelpers.js";
 
 import OpenSeaLogo from '../svg/opensea-logo.svg';
@@ -12,70 +13,63 @@ const getShardInfo = async (id) => {
 }
 
 export const ShardInner = (props) => {
-  const tokId = parseInt(props.id, 16);
   const prettyId = prettyfyId(nftId(props.id));
-  console.log(tokId, prettyId, props.id);
-  return (
-    <div className="Shard-main">
-      {props.name && props.estile && 
-        <div className="shard-header">
-          {props.name}
-          <span className="grow" />
-          {props.estile && 
-            <a href={"https://testnets.opensea.io/assets/"+props.estile.address+"/"+tokId}>
-              <img src={OpenSeaLogo} alt="OpenSea" />
-            </a>
-          }
-        </div>
-      }
-      <div className="bg">
-        <img src={tileImgUri(props.id)} alt={props.id} />
-      </div>
-      <div className="col">
-        <div>Token ID</div>
-        <div>{prettyId}</div>
-      </div>
-      {!props.balance || !props.supply && 
-        <div>Loading balances...</div>
-      }
-      {props.balance && props.supply &&
-        <>
-          <div className="col">
-            <div>Your balance</div>
-            <div>{props.balance}</div>
-          </div>
-          <div className="col">
-            <div>Total supply</div>
-            <div>{props.supply}</div>
-          </div>
-        </>
-      }
-    </div>
-  );
-}
-
-export const Shard = (props) => {
-  let {id} = useParams();
-  const tokId = parseInt(id, 16);
-  const prettyId = prettyfyId(id);
   const [desc, setDesc] = useState();
   const [tokInfo, setTokInfo] = useState();
 
   if (!desc && props.user && props.estile) {
-    getShardInfo(id)
+    getShardInfo(props.id)
       .then(setDesc);
   }
   if (!tokInfo && props.user && props.estile) {
-    getTokenBalance(props.estile, props.user, tokId)
+    getTokenBalance(props.estile, props.user, props.id)
       .then(setTokInfo);
   }
+
+  if (!desc || !tokInfo) {
+    return (
+      <div className="Shard-main">
+        <Loading message="Fetching token details" />
+      </div>
+    );
+  }
+
   return (
-    <ShardInner
-      {...props}
-      name={(desc && desc.name) || "loading ..."}
-      id={id}
-      balance={(tokInfo && tokInfo.balance.toString()) || "loading ..."}
-      supply={(tokInfo && tokInfo.supply.toString()) || "loading ..."} />
+    <div className="shard-main">
+      <div className="shard-header">
+        {desc.name}
+        <span className="grow" />
+      </div>
+      <div className="bg">
+        <img src={tileImgUri(props.id)} alt={props.id} />
+      </div>
+      <p>{desc.description}</p>
+      <p>The NFT id for this shard is {prettyId}.</p>
+      <p>There are currently {tokInfo.supply.toString()} of these tokens in existence, and you own {tokInfo.balance.toString()} of them!
+      </p>
+      <div className="social-link">
+        <div>View this NFT on: </div>
+        <div>
+          <a href={"https://testnets.opensea.io/assets/"+props.estile.address+"/"+props.id}>
+            <img src={OpenSeaLogo} alt="OpenSea" /><span>OpenSea</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/*
+ *  If we end up rendering shards as a separate page, use this component to 
+ *  wrap the `ShardInner` and parse the hex string etc from the URL params.
+ */
+export const Shard = (props) => {
+  let {id} = useParams();
+  const intId = parseInt(id, 16);
+  return (
+    <div className="shard-page">
+      <ShardInner {...props} id={intId} />
+    </div>
   );
 }
 

@@ -5,10 +5,12 @@
 // React and associated components.
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
+import ReactTooltip from "react-tooltip";
 
 import Web3 from "web3";
 
 import MainLayout from "./pages/MainLayout.js";
+import {Footer} from "./components/Footer.js";
 
 // Contract ABIs.
 import _EscapeToken from "./contract/EscapeToken.json";
@@ -16,8 +18,11 @@ import _ESTile from "./contract/ESTile.json";
 import _ESTileWrapper from "./contract/ESTileWrapper.json";
 import _NamingContract from "./contract/NamingContract.json";
 
-
 import "./App.css";
+
+////////////////////////////////////////////////////////////////////////////////
+
+const toBN = Web3.utils.toBN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -35,8 +40,8 @@ class App extends Component {
 
     this.state = {
       // Number of ESCAPE credit balance for user.
-      escapeBalance: 0,
-      escapeClaimable: 0,
+      escapeBalance: toBN(0),
+      escapeClaimable: toBN(0),
 
       // Total scene info stuff.
       numScenes: 0,
@@ -204,21 +209,47 @@ class App extends Component {
           <NavLink exact activeClassName="isActive" to="/">EtherScapes</NavLink>
           <NavLink exact activeClassName="isActive" to="/about">FAQ</NavLink>
           <div className="grow"></div>
-          <div className="balance">{this.state.escapeBalance.toString()} ESC</div>
-          <div className="balance" onClick={()=> {this.claimReward()}}>({this.state.escapeClaimable.toString()}, +{this.state.numClaims.toString()} per day)</div>
+          <div className="balance" data-tip data-for="balanceTooltip">
+            {this.state.escapeBalance.toString()} ESC
+          </div>
+          {this.state.escapeClaimable !== undefined && this.state.escapeClaimable.toNumber() > 0 && 
+            <div className="balance clickable" 
+                 onClick={()=> {this.claimReward()}} 
+                 data-tip data-for="claimTooltip">
+              ({this.state.escapeClaimable.toString()}, +{this.state.numClaims.toString()} per day)
+            </div>
+          }
+          {this.state.escapeClaimable !== undefined && this.state.escapeClaimable.toNumber() === 0 && 
+            <div className="balance" data-tip data-for="claimTooltip">
+              ({this.state.escapeClaimable.toString()}, +{this.state.numClaims.toString()} per day)
+            </div>
+          }
+          <ReactTooltip id="claimTooltip" arrowColor="var(--color-font)" place="bottom">
+            <p>Claimable ESCAPE, <br></br>
+               earnings per day.
+            </p>
+          </ReactTooltip>   
+          <ReactTooltip id="balanceTooltip" arrowColor="var(--color-font)" place="bottom">
+            <p>Your current ESCAPE balance.</p>
+          </ReactTooltip>   
         </div>
         <div className="App-body">
-          <MainLayout 
-            balance={this.state.escapeBalance}
-            claim={this.state.escapeClaimable}
-            numScenes={this.state.numScenes}
-            numPacks={this.state.numPacks}
-            escape={this.state.escape}
-            estile={this.state.estile}
-            namer={this.state.namer}
-            estilewrap={this.state.estilewrap} 
-            user={this.accounts[0]}
-          />
+          <div className="App-scroll">
+            <div style={{flexGrow: 1}}>
+              <MainLayout 
+                balance={this.state.escapeBalance}
+                claim={this.state.escapeClaimable}
+                numScenes={this.state.numScenes}
+                numPacks={this.state.numPacks}
+                escape={this.state.escape}
+                estile={this.state.estile}
+                namer={this.state.namer}
+                estilewrap={this.state.estilewrap} 
+                user={this.accounts[0]}
+              />
+            </div>
+            <Footer />
+          </div>
         </div>
       </div>
     );

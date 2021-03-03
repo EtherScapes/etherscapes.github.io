@@ -1,8 +1,11 @@
 import React, {useState, useRef, useEffect} from "react";
 import { useParams } from "react-router";
 import { useHistory } from "react-router-dom";
+import ReactTooltip from "react-tooltip";
 
 import {Loading} from "../components/Loading.js";
+import {useInput} from "../components/Overlays.js";
+import {ProgressBar} from "../components/ProgressBar.js";
 import {getSceneInfo, getTokenBalance, nftId, prettyfyId, tileImgUri, tileDataUri} from "../components/contractHelpers.js";
 import {BuyTilesModal, ShardPreviewModal} from "../components/Overlays.js";
 
@@ -31,11 +34,11 @@ const Tile = (props) => {
       });
   }
   return (
-    <div className="th" onClick={()=>{props.preview(props.id)}}>
-      <div><img src={tileImgUri(props.id)} width="42px" height="42px"></img> ({props.type})</div>
+    <div className="th shard-row" onClick={()=>{props.preview(props.id)}}>
+      <div><img src={tileImgUri(props.id)} alt="" width="42px" height="auto"></img> ({props.type})</div>
       <div>{balance.toString()}</div>
       <div>{total.toString()}</div>
-      <div><a className="link" href={"/shard/"+nftId(props.id)}>{prettyfyId(nftId(props.id))}</a></div>
+      <div>{prettyfyId(nftId(props.id))}</div>
     </div>
   );
 }
@@ -80,14 +83,12 @@ const PuzzleViewer = (props) => {
 
   const canvasRef = useRef(null);
 
+  const ownsSolvedToken = puzzleToken && puzzleToken.balance && puzzleToken.balance.toNumber() > 0;
+
   const draw = async (context, reset=false) => {
     if (sceneDesc.sceneId === undefined) return;
     
     const ptok = sceneDesc.puzzleTokenStart + puzzleId;
-    const tileTokenOffset = puzzleId * sceneDesc.tilesPerPuzzle
-    const tileTokenStart = sceneDesc.tileTokenStart + tileTokenOffset;
-    const ownsSolvedToken = puzzleToken && puzzleToken.balance && puzzleToken.balance.toNumber() > 0;
-    
     const canvas = canvasRef.current;
 
     if (!canvas.hasBackground && puzzleToken.balance !== undefined) {
@@ -95,7 +96,6 @@ const PuzzleViewer = (props) => {
       img.width = 1920;
       img.height = 1080;
       img.onload = async () => {
-        // TODO: Debounce if pid / sid changed for the inner draws.
         context.drawImage(img, 0, 0);
         canvas.hasBackground = ptok;
         canvas.drawnTokens = {};
@@ -135,7 +135,10 @@ const PuzzleViewer = (props) => {
 
   const [puzzleNamer, setPuzzleNamer] = useState("");
   const [puzzleName, setPuzzleName] = useState("Unnamed");
+  const [showPuzzleNaming, setShowPuzzleNaming] = useState(false);
   const [puzzleNamingCost, setPuzzleNamingCost] = useState(0);
+  const [newPuzzleName, newPuzzleNameInput] = useInput("text", "");
+
   const refreshPuzzleNameInfo = async (sid, pid) => {
     const result = await props.namer.getScenePuzzleInfo(sid, pid);
     setPuzzleNamingCost(result[0].toNumber());
@@ -161,11 +164,12 @@ const PuzzleViewer = (props) => {
     const context = canvas.getContext("2d")
     draw(context);
     refreshPuzzleNameInfo(sceneId, puzzleId);
-  }, [draw, refreshPuzzleNameInfo, ownedTokens, puzzleToken, sceneDesc]);
+  }, [draw, refreshPuzzleNameInfo, sceneId, puzzleId, sceneLoading, ownedTokens, puzzleToken, sceneDesc]);
 
   //////////////////////////////////////////////////////////////////////////////
 
   const gotoScene = async (_sid, _pid) => {
+    setShowPuzzleNaming(false);
     if (_sid !== sceneId) setSceneLoading(true);
     if (_pid !== puzzleId) setOwnedTokens([]); // reset - ing puzzles.
     history.push("/scene/" + _sid + "/puzzle/" + (_pid+1));
@@ -198,9 +202,6 @@ const PuzzleViewer = (props) => {
     return <Loading message={"Scene "+ sceneId +" loading "}/>;
   }
 
-  const isRedeemable = !sceneLoading && true; //tokenDesc.puzzleRedeemable;
-  const isRenameable  = !sceneLoading && puzzleToken.balance && puzzleToken.balance.toNumber() > 0;
-  
   let puzzleTileTokenRows;
   let puzzleTokenRow;
   if (sceneLoading) {
@@ -257,41 +258,69 @@ const PuzzleViewer = (props) => {
           {puzzleId+1}
           <span className={nextPuzzleClass} onClick={nextPuzzle}>&gt;</span>
           <span className="spacer" />
-          {uniqueTokensOwned < sceneDesc.tilesPerPuzzle &&
-            <span>{uniqueTokensOwned} / {sceneDesc.tilesPerPuzzle} owned</span>
-          }
-          {uniqueTokensOwned === sceneDesc.tilesPerPuzzle &&
-            <span className="clickable" onClick={()=>{solvePuzzle(sceneId, puzzleId);}}>Solve Puzzle</span>
-          }
           <span className="grow"></span>
+          {puzzleToken && puzzleToken.balance && puzzleToken.balance.toNumber() > 0 &&
+            <span style={{marginRight: "15px"}}>solved x{puzzleToken.balance.toString()}</span>
+          }
         </div>}
       
       {!sceneLoading && 
         <div className="puzzle-viewer">
+          <div className="puzzle-name clickable">
+            <div className="grow" style={{width: "100%"}} onClick={()=>{setShowPuzzleNaming(!showPuzzleNaming)}}>
+              "{puzzleName}"
+            </div>
+            {showPuzzleNaming && 
+              <div className="puzzle-name-details">
+                <div>This puzzle currently costs {puzzleNamingCost} ESCAPE to rename.</div>
+                <div>The last address to name the puzzle was {puzzleNamer}.</div>
+                {puzzleToken && puzzleToken.balance && puzzleToken.balance.toNumber() > 0 &&
+                  <div className="puzzle-name-input">
+                    {newPuzzleNameInput} 
+                    <div className="clickable" onClick={()=>{renamePuzzle(sceneId, puzzleId, newPuzzleName)}}>Rename puzzle</div>
+                  </div>
+                }
+                {puzzleToken && puzzleToken.balance && puzzleToken.balance.toNumber() === 0 &&
+                  <div>You must first solve the puzzle to name it.</div>
+                }
+              </div>
+            }
+          </div>
           <canvas ref={canvasRef} className="canvas" width="1920" height="1080">
             Blocks: art on the blockchain.
           </canvas>
-          <div className="puzzle-name col">
-            <div className="grow">"{puzzleName}"</div>
-          </div>
-          <div className="buy-tiles clickable" onClick={()=>{setBuyTilesForSceneId(sceneId)}}>
-            <img src={BuySVG} alt="buy shards"></img> buy shards
-          </div>
-          {/* <div className="puzzle-author">
-            {puzzleNamer}
-          </div>
-          {isRenameable && 
-            <div className="rename-toolbar">
-              <span className="clickable" onClick={()=>{renamePuzzle(sceneId, puzzleId, "foobar");}}>
-                RENAME ({puzzleNamingCost} ESC)
-              </span>
+          <div className="puzzle-toolbar">
+            {uniqueTokensOwned < sceneDesc.tilesPerPuzzle &&
+            <>
+              <ProgressBar 
+                count={uniqueTokensOwned} 
+                total={sceneDesc.tilesPerPuzzle} >
+              </ProgressBar>
+              <div style={{marginLeft: "8px", fontSize: "10pt"}}>
+                shards collected
+              </div>
+            </>
+            }
+            {uniqueTokensOwned === sceneDesc.tilesPerPuzzle &&
+            <>
+              <div className="clickable" style={{marginLeft: "15px"}} 
+                   onClick={()=>{solvePuzzle(sceneId, puzzleId)}}
+                   data-tip data-for="solveTooltip">
+                solve puzzle
+              </div>
+              <ReactTooltip id="solveTooltip" arrowColor="var(--color-font)" place="bottom">
+                <p>Merge all shards in a puzzle to<br></br> 
+                   solve it and mint a rare puzzle<br></br>
+                   token.
+                </p>
+              </ReactTooltip>
+            </>
+            }
+            <div className="grow"></div>
+            <div className="col clickable" onClick={()=>{setBuyTilesForSceneId(sceneId)}}>
+              <img src={BuySVG} alt="buy shards"></img> buy shards
             </div>
-          }
-          {!isRenameable && 
-            <div className="rename-toolbar">
-              Solve the puzzle to change it's name.
-            </div>
-          } */}
+          </div>
           <div className="token-table">
             <div className="th underline">
               <div></div>
