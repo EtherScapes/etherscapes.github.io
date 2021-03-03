@@ -132,30 +132,20 @@ const TileStore = (props) => {
     </div>
   );
 
-  const overrideTooltipPositionFunc = ({ left, top }, currentEvent, currentTarget, node) => {
-    const d = document.documentElement;
-    left = Math.min(d.clientWidth - node.clientWidth, left);
-    top = Math.min(d.clientHeight - node.clientHeight, top);
-    left = Math.max(0, left);
-    top = Math.max(0, top);
-    console.log(top, left);
-    return { top, left }
-  };
-
   return (
     <>
       <div className="tooltips">
-        <ReactTooltip id="infoEscapeTooltip" arrowColor="var(--color-font)" overridePosition={overrideTooltipPositionFunc}>
+        <ReactTooltip id="infoEscapeTooltip" arrowColor="var(--color-font)">
           <p>🔥 Burn ESCAPE (ERC20) for shards from open rifts.</p>
           <p>🔥 Burn ESCAPE to (re)name solved puzzles.</p>
         </ReactTooltip>
-        <ReactTooltip id="infoShardTooltip" arrowColor="var(--color-font)" overridePosition={overrideTooltipPositionFunc}>
+        <ReactTooltip id="infoShardTooltip" arrowColor="var(--color-font)">
           <p>🧩 Shards are puzzle pieces from EtherScape rifts.</p>
           <p>📰 Each shard is a NFT (ERC1155) with limited supply.</p>
           <p>🚧 Rifts will mint random shards until they run out.</p>
           <p>💰 Trade shard tokens on 3rd party markets.</p>
         </ReactTooltip>
-        <ReactTooltip id="infoPuzzleTooltip" arrowColor="var(--color-font)" overridePosition={overrideTooltipPositionFunc}>
+        <ReactTooltip id="infoPuzzleTooltip" arrowColor="var(--color-font)">
           <p>🧩 Each rift contains a set number of puzzles to solve.</p>
           <p>🔥 Burn all shards from a puzzle to solve it.</p>
           <p>💰 Solved puzzles reward even rarer NFTs and earn 1 ESCAPE per day.</p>
