@@ -50,7 +50,7 @@ export const ShardInner = (props) => {
       <div className="social-link">
         <div>View this NFT on: </div>
         <div>
-          <a href={"https://testnets.opensea.io/assets/"+props.estile.address+"/"+props.id}>
+          <a href={"https://opensea.io/assets/"+props.estile.address+"/"+props.id}>
             <img src={OpenSeaLogo} alt="OpenSea" /><span>OpenSea</span>
           </a>
         </div>
