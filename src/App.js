@@ -53,6 +53,8 @@ class App extends Component {
       namer: undefined,
       estile: undefined,
       estilewrap: undefined,
+
+      error: undefined,
     };
   }
 
@@ -96,6 +98,7 @@ class App extends Component {
       this.web3 = new Web3(window.web3.currentProvider);
     } else {
       console.error("No web3 provider detected!");
+      this.setState({error: "Oops, this app needs a Web3 enabled browser!"});
       return;
     }
 
@@ -236,17 +239,22 @@ class App extends Component {
         <div className="App-body">
           <div className="App-scroll">
             <div style={{flexGrow: 1}}>
-              <MainLayout 
-                balance={this.state.escapeBalance}
-                claim={this.state.escapeClaimable}
-                numScenes={this.state.numScenes}
-                numPacks={this.state.numPacks}
-                escape={this.state.escape}
-                estile={this.state.estile}
-                namer={this.state.namer}
-                estilewrap={this.state.estilewrap} 
-                user={this.accounts[0]}
-              />
+              {!this.state.error &&
+                <MainLayout 
+                  balance={this.state.escapeBalance}
+                  claim={this.state.escapeClaimable}
+                  numScenes={this.state.numScenes}
+                  numPacks={this.state.numPacks}
+                  escape={this.state.escape}
+                  estile={this.state.estile}
+                  namer={this.state.namer}
+                  estilewrap={this.state.estilewrap} 
+                  user={this.accounts[0]}
+                />
+              }
+              {this.state.error &&
+                <div className="error">{this.state.error}</div>
+              }
             </div>
             <Footer />
           </div>

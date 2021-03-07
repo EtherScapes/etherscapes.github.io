@@ -56,6 +56,14 @@ html, body {
   background-color: var(--color-background);
 }
 
+.error {
+  height: 100%;
+  display: flex;
+  padding: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
 .App {
   display: flex;
   flex: 1;
