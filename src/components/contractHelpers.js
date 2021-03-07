@@ -1,3 +1,4 @@
+import Web3 from "web3";
 
 export const prettyfyId = (strId) => {
   let s = "0x";
@@ -110,6 +111,7 @@ export const getSceneInfo = async (estile, user, sceneId) => {
     puzzleTokenStart: start_puzzle_range,
     puzzleTokenEnd: end_puzzle_range,
     numTiles: numTiles,
+    maxTiles: Web3.utils.toBN(sceneId === 1 ? "1200" : "0"),
     tilesLeft: _tileInfo[0],
     ethCost: _tileInfo[1],
     escCost: _tileInfo[2],

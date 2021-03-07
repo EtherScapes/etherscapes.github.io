@@ -9,9 +9,9 @@ export const Footer = (props) => {
     <div className="footer">
       <span>© EtherScapes Inc</span>
       <span className="grow"></span>
-      <a href="https://github.com/etherscapes/contract"><span><img src={GitHubSVG} alt="github"></img></span></a>
-      <a href="https://discord.gg/kTmmeB6bes"><span><img src={DiscordSVG} alt="github"></img></span></a>
-      <a href="https://www.reddit.com/r/Etherscapes"><span><img src={RedditSVG} alt="github"></img></span></a>
+      <a className="github" href="https://github.com/etherscapes/contract"><span><img src={GitHubSVG} alt="github"></img></span></a>
+      <a className="discord" href="https://discord.gg/kTmmeB6bes"><span><img src={DiscordSVG} alt="github"></img></span></a>
+      <a className="reddit" href="https://www.reddit.com/r/Etherscapes"><span><img src={RedditSVG} alt="github"></img></span></a>
     </div>
   );
 }

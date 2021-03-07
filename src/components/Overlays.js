@@ -33,7 +33,7 @@ export const useInput = (type, def) => {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export const useEscape = (onEscape) => {
+export const useEscapeKey = (onEscape) => {
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.keyCode === 27) 
@@ -51,34 +51,58 @@ export const useEscape = (onEscape) => {
 
 export const BuyTilesModal = (props) => {
   const [numToBuy, numToBuyInput] = useInput("number", 1);
+  const [isTxPending, setTxPending] = useState(false);
+  const [tx, setTx] = useState(undefined);
+  const [err, setErr] = useState(undefined);
 
   //////////////////////////////////////////////////////////////////////////////
 
   const buyTilesETH = async () => {
+    setTx(undefined);
+    setTxPending(true);
+
     let cost = Web3.utils.toWei("0.02", "ether");
-    await props.estilewrap.buyTilesForETH(props.sceneId, numToBuy, {
+    const rsp = await props.estilewrap.buyTilesForETH(props.sceneId, numToBuy, {
       value: cost * numToBuy, 
       from: props.user
     }).catch((err) => {
-      console.log("Something went wrong,", err);
+      setErr(err)
     });
-    await props.close();
-    await props.updateSceneInfo(props.sceneId);
+
+    if (rsp) {
+      setTx(rsp.tx);
+      setTxPending(false);
+      props.updateSceneInfo(props.sceneId);
+    }
   }
 
   const buyTilesEscape = async () => {
-    await props.estilewrap.buyTilesForEscape(props.sceneId, numToBuy, {
+    setTx(undefined);
+    setTxPending(true);
+
+    const rsp = await props.estilewrap.buyTilesForEscape(props.sceneId, numToBuy, {
       from: props.user
     }).catch((err) => {
-      console.log("Something went wrong,", err);
+      setErr(err);
     });
-    await props.close();
-    await props.updateSceneInfo(props.sceneId);
+
+    if (rsp) {
+      setTx(rsp.tx);
+      setTxPending(false);
+      props.updateSceneInfo(props.sceneId);
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////
+  
+  const closeModal = () => {
+    setErr(undefined);
+    setTxPending(false);
+    setTx(undefined);
+    props.close();
+  }
 
-  useEscape(() => props.close());
+  useEscapeKey(() => closeModal());
   
   const ethTileCost = toBN(Web3.utils.toWei("0.02", "ether").toString());
   const escTileCost = toBN(Web3.utils.toWei("5", "wei").toString());
@@ -90,24 +114,46 @@ export const BuyTilesModal = (props) => {
   return (
     <>
       {props.sceneId > 0 &&
-        <Modal doClose={()=>{props.close()}}>
+        <Modal doClose={()=>{closeModal()}}>
           <div className="tilestore-modal">
             <h1>Buying tiles for rift {props.sceneId}</h1>
             <br></br>
-            <div className="col">
-              <div>Number of shards to purchase:</div>
-            </div> 
-            <div className="col input-div">
-              {numToBuyInput}
-            </div>
-            <br></br>
-            <div className="col">
-              <div className="clickable" onClick={() => {buyTilesEscape();}}>Use {escCost} ESC</div>
-              <span className="spacer"></span>
-              <div className="clickable" onClick={() => {buyTilesETH();}}>Use {ethCost} ETH</div>
-              <div className="grow"></div>
-              <div className="clickable" onClick={() => {props.close()}}>CLOSE</div>
-            </div>
+            {!isTxPending && !tx && 
+              <>
+                <div className="col">
+                  <div>Number of shards to purchase:</div>
+                </div>
+                <div className="col input-div">
+                  {numToBuyInput}
+                </div>
+              </>}
+              {isTxPending && !tx &&
+                <div className="col">
+                  <div>Transaction pending ...</div>
+                </div>
+              }
+              {!isTxPending && tx && 
+                <div className="col">
+                  <div><a className="clickable" href={"https://etherscan.io/tx/"+tx}>view tx etherscan</a></div>
+                </div>
+              }
+              <>
+                <br></br>
+                <div className="col">
+                  {!isTxPending && !tx && <>
+                    <div className="clickable" onClick={() => {buyTilesEscape();}}>Use {escCost} ESC</div>
+                    <span className="spacer"></span>
+                    <div className="clickable" onClick={() => {buyTilesETH();}}>Use {ethCost} ETH</div>
+                  </>}
+                  {err &&
+                    <div className="col">
+                      <div>Uh oh, thats an error ...</div>
+                    </div>
+                  }
+                  <div className="grow"></div>
+                  <div className="clickable" onClick={() => {closeModal()}}>CLOSE</div>
+                </div>
+              </>
           </div>
         </Modal>
       }
@@ -119,7 +165,7 @@ export const BuyTilesModal = (props) => {
 
 export const ShardPreviewModal = (props) => {
   
-  useEscape(() => props.close());
+  useEscapeKey(() => props.close());
 
   return (
     <>

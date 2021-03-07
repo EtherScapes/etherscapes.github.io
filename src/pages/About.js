@@ -1,51 +1,89 @@
-import React from "react";
+import React, {useState} from "react";
+
+const FAQSection = (props) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="faq-section">
+      <div className="faq-question" onClick={() => {setShow(!show)}}>{props.question}</div>
+      {show && <div className="faq-body">{props.children}</div>}
+    </div>
+  );
+}
 
 const About = () => {
   return (
-    <div className="About-main">
-      <h3>What are EtherScapes?</h3>
-      <p>
-        EtherScapes is a procedurally generated jig-saw puzzle collectable. 
-      </p>
-      <p>
-        Each scene in our collection is broken up into puzzle pictures.
-        Each picture makes up a puzzle broken into JigSaw tiles. The tiles 
-        themselves and the solved puzzles are collectable and tradeable on markets
-        like opensea and rarible (they are tradeable ERC1155 tokens).
-      </p>
+    <div className="faq-main">
+      <FAQSection question="What are EtherScapes?">
+        <p>
+          EtherScapes are procedurally generated NFT puzzles. 
+        </p>
+        <p>
+          Each rift in our collection is made up puzzle pictures. Each puzzle is 
+          made of puzzle shards. Solve puzzles by collecting all the relevant 
+          shard pieces and trading them in for a super-rare puzzle NFT. 
+        </p>
+      </FAQSection>
 
-      <h3>How does it work?</h3>
-      <p>
-        Purchase packs with ETH or ESCAPE tokens. Each pack is associated with a 
-        scene and will mint puzzle tiles from the scene at random. 
-      </p>
-      <p>
-        Some packs are special and cannot be purchased for ETH at the contract 
-        exchange rate.
-      </p>
+      <FAQSection question="How does it work?">
+        <p>
+          Purchase shards from open rifts with Ether or ESCAPE tokens. Each rift
+          has a limited number of shards available - grab yours today!
+        </p>
+        <p>
+          Each shard is minted at random by the rift, once you have all the shards
+          in a puzzle, you can trade them in for the solved puzzle NFT. This NFT
+          is special and earns you 1 ESCAPE per day per solved NFT you own!
+        </p>
+      </FAQSection>
       
-      <h3>ESCAPEs? What are these?</h3>
-      <p>
-        ESCAPEs are a tradeable ERC20 token that is minted by the EtherScapes contract
-        anytime a puzzle in a scene is solved. To solve a puzzle, collect and trade-in
-        all tokens for a single picture (this will burn the induvidual tiles!). However,
-        this will also release a fixed percent of the ESCAPE locked up in the scene's 
-        reward pool!
-      </p>
-      <p>
-        ESCAPEs can also be used to give each picture in each scene a name of your 
-        choosing. To assign a name to a picture, you must have at-least one token 
-        that represents the completed picture. Each time a picture is named, the 
-        naming cost for the picture doubles.
-      </p>
+      <FAQSection question="ESCAPEs? What are these?">
+        <p>
+          ESCAPEs are a tradeable ERC20 token that is minted by the EtherScapes contract
+          anytime a puzzle in a rift is solved. 
+        </p>
+        <p>
+          Use ESCAPE to purchase tiles from open rifts. 
+        </p>
+        <p>
+          ESCAPEs can also be used to give each rift puzzle a unique name of your 
+          choosing. To assign a name to a puzzle, you must own the NFT for the puzzle
+          you are trying to name. Each time a picture is named, the naming cost 
+          for the picture doubles.
+        </p>
+      </FAQSection>
 
-      <h3>Other market integration</h3>
-      <p>
-        The puzzle packs, the tiles, and the solved puzzles are all tradeable 
-        ERC1155 tokens. This means you can sell / trade the packs without ever
-        opening them! Trade tokens with friends to complete pictures and earn 
-        ESCAPE!
-      </p>
+      <FAQSection question="Other market integration?">
+        <p>
+          The EtherScape shards and solved puzzles are all tradeable NFTs (ERC1155
+          tokens). This means you can sell or trade the shards or puzzles on markets
+          like OpenSea and Rarible. 
+        </p>
+        <p>
+          Find the pieces you are missing and trade duplicates to solve puzzles and 
+          earn ESCAPE today!
+        </p>
+      </FAQSection>
+
+      <FAQSection question="Can I see the code?">
+        <p>
+          All of the code involved in this project is available on GitHub and is 
+          100% open source. Check out our 
+          <a href="https://github.com/etherscapes">GitHub project page</a> for more info.
+        </p>
+        <p>
+          The contract was developed using Solidity, with tests implemented to boot.
+          The website is a React app hosted on GitHub pages, with the NFT metadata 
+          currently hosted also via a public GitHub metadata project. Additionally,
+          this project uses a simple python project to cut up puzzle images into 
+          N number of shards based on SVG cutouts that we generate.
+        </p>
+        <p>
+          We love feedback, and would appreciate your thoughts either in our 
+          <a href="https://discord.gg/kTmmeB6bes">Discord</a>, 
+          <a href="https://reddit.com/r/etherscapes">Reddit</a>,
+          <a href="https://github.com/etherscapes">GitHub</a> channels.
+        </p>
+      </FAQSection>
     </div>
   );
 }

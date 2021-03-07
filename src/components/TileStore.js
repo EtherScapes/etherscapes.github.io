@@ -86,7 +86,7 @@ const TileStore = (props) => {
           <div className="scene-details">
             <div className="col">
               <div>rift #{scene.sceneId}</div>
-              <div>{scene.tilesLeft.toString()} shards left</div>
+              <div>{scene.tilesLeft.toString()} / {scene.maxTiles.toString()} shards left</div>
             </div>
             <div className="col">
               <div>shard cost:</div>
@@ -136,20 +136,20 @@ const TileStore = (props) => {
     <>
       <div className="tooltips">
         <ReactTooltip id="infoEscapeTooltip" arrowColor="var(--color-font)">
-          <p>🔥 Burn ESCAPE (ERC20) for shards from open rifts.</p>
-          <p>🔥 Burn ESCAPE to (re)name solved puzzles.</p>
+          <p><span role="img" aria-label="burn">🔥</span> Burn ESCAPE (ERC20) for shards from open rifts.</p>
+          <p><span role="img" aria-label="burn">🔥</span> Burn ESCAPE to (re)name solved puzzles.</p>
         </ReactTooltip>
         <ReactTooltip id="infoShardTooltip" arrowColor="var(--color-font)">
-          <p>🧩 Shards are puzzle pieces from EtherScape rifts.</p>
-          <p>📰 Each shard is a NFT (ERC1155) with limited supply.</p>
-          <p>🚧 Rifts will mint random shards until they run out.</p>
-          <p>💰 Trade shard tokens on 3rd party markets.</p>
+          <p><span role="img" aria-label="tile">🧩</span> Shards are puzzle pieces from EtherScape rifts.</p>
+          <p><span role="img" aria-label="contract">📰</span> Each shard is a NFT (ERC1155) with limited supply.</p>
+          <p><span role="img" aria-label="factory">🚧</span> Rifts will mint random shards until they run out.</p>
+          <p><span role="img" aria-label="earn">💰</span> Trade shard tokens on 3rd party markets.</p>
         </ReactTooltip>
         <ReactTooltip id="infoPuzzleTooltip" arrowColor="var(--color-font)">
-          <p>🧩 Each rift contains a set number of puzzles to solve.</p>
-          <p>🔥 Burn all shards from a puzzle to solve it.</p>
-          <p>💰 Solved puzzles reward even rarer NFTs and earn 1 ESCAPE per day.</p>
-          <p>💰 Trade completed puzzle tokens on 3rd party markets.</p>
+          <p><span role="img" aria-label="tile">🧩</span> Each rift contains a set number of puzzles to solve.</p>
+          <p><span role="img" aria-label="burn">🔥</span> Burn all shards from a puzzle to solve it.</p>
+          <p><span role="img" aria-label="earn">💰</span> Solved puzzles reward even rarer NFTs and earn 1 ESCAPE per day.</p>
+          <p><span role="img" aria-label="earn">💰</span> Trade completed puzzle tokens on 3rd party markets.</p>
         </ReactTooltip>
       </div>
       <div className="TileStore-main">
