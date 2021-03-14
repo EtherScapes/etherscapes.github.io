@@ -3,7 +3,7 @@
  */
 
 // React and associated components.
-import React, { Component } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import ReactTooltip from "react-tooltip";
 
@@ -18,6 +18,19 @@ import _ESTile from "./contract/ESTile.json";
 import _ESTileWrapper from "./contract/ESTileWrapper.json";
 import _NamingContract from "./contract/NamingContract.json";
 
+import { injected } from './components/Connectors.ts';
+import { useWeb3React } from "@web3-react/core";
+// import {
+//   InjectedConnector,
+//   NoEthereumProviderError,
+//   UserRejectedRequestError as UserRejectedRequestErrorInjected
+// } from "@web3-react/injected-connector";
+import { useEagerConnect, useInactiveListener } from "./components/Hooks.ts";
+// import { Web3Provider } from "@ethersproject/providers";
+// import { formatEther } from "@ethersproject/units";
+
+////////////////////////////////////////////////////////////////////////////////
+
 import "./App.css";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,242 +39,164 @@ const toBN = Web3.utils.toBN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class App extends Component {
-  // App constructor - sets up default state.
-  constructor(props) {
-    super(props);
+const App = (props) => {
+  const context = useWeb3React();
+  const { connector, library, chainId, account, activate, deactivate, 
+          active, error } = context;
+
+  // handle logic to recognize the connector currently being activated
+  const [activatingConnector, setActivatingConnector] = React.useState();
+  React.useEffect(() => {
+    if (activatingConnector && activatingConnector === connector) {
+      setActivatingConnector(undefined);
+    }
+  }, [activatingConnector, connector]);
+
+  // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
+  const triedEager = useEagerConnect();
+
+  // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
+  useInactiveListener(!triedEager || !!activatingConnector);
+  const [contractsLoaded, setContractsLoaded] = useState(false);
+  const [escapeBalance, setEscapeBalance] = useState(toBN(0));
+  const [escapeClaimable, setEscapeClaimable] = useState(toBN(0));
+  const [numScenes, setNumScenes] = useState(0);
+  const [numClaims, setNumClaims] = useState(0);
+
+  const [escape, setEscape] = useState(undefined);
+  const [namer, setNamer] = useState(undefined);
+  const [estile, setESTile] = useState(undefined);
+  const [estilewrap, setESTileWrap] = useState(undefined);
+
+  // Callback to claim reward.
+  const claimReward = useCallback(async () => {
+    console.log(estile, account);
+    return await estile.claimReward({from: account});
+  }, [estile, account])
+
+  // Callback to setup contracts (assumes user is setup!)
+  useEffect(() => {
+    async function setupContracts() {
+      const contract = require("@truffle/contract");
+    
+      let EscapeTokenABI = contract(_EscapeToken);
+      let ESTileABI = contract(_ESTile);
+      let ESTileWrapperABI = contract(_ESTileWrapper);
+      let NamingContractABI = contract(_NamingContract);
+  
+      EscapeTokenABI.setProvider(window.web3.currentProvider);
+      ESTileABI.setProvider(window.web3.currentProvider);
+      ESTileWrapperABI.setProvider(window.web3.currentProvider);
+      NamingContractABI.setProvider(window.web3.currentProvider);
+  
+      const cEscape = await EscapeTokenABI.deployed();
+      const cESTile = await ESTileABI.deployed();
+      const cESTileWrap = await ESTileWrapperABI.deployed();
+      const cNamer = await NamingContractABI.deployed();
+  
+      setESTile(cESTile);
+      setEscape(cEscape);
+      setESTileWrap(cESTileWrap);
+      setNamer(cNamer);
+  
+      setContractsLoaded(true);
+    }
+    setupContracts();
+  }, [setNamer, setESTileWrap, setESTile, setEscape, setContractsLoaded]);
+
+  useEffect(() => {
+    async function setupBalances() {
+      if (!(estile && escape && account)) return;
       
-    this.updateAccounts = this.updateAccounts.bind(this);
-
-    this.web3 = null;
-    this.contracts = {};
-    this.contracts_abi = {};
-    this.accounts = [];
-
-    this.state = {
-      // Number of ESCAPE credit balance for user.
-      escapeBalance: toBN(0),
-      escapeClaimable: toBN(0),
-
-      // Total scene info stuff.
-      numScenes: 0,
-
-      // Number of solved puzzle tokens.
-      numClaims: 0,
-
-      escape: undefined,
-      namer: undefined,
-      estile: undefined,
-      estilewrap: undefined,
-
-      error: undefined,
-    };
-  }
-
-  // mounted ::
-  componentDidMount() {
-    return this.initWeb3();
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Helpers.
-  ////////////////////////////////////////////////////////////////////////////
-
-  resolve_promise = (f, args=[]) => {
-    return new Promise((resolve, reject) => {
-      f(...args, (err, result) => {
-        if (err !== null) reject(err);
-        else resolve(result);
-      });
-    });
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  //  Contract basics.
-  ////////////////////////////////////////////////////////////////////////////
-
-  initWeb3 = async () => {
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        this.updateAccounts(accounts);
-        window.ethereum.on("accountsChanged", this.updateAccounts);
-        window.ethereum.enable();
-      } catch (err) {
-        console.log("User denied web3 account access");
-        return;
-      }
-      this.web3 = new Web3(window.ethereum);
-    } else if (window.web3) {
-      this.web3 = new Web3(window.web3.currentProvider);
-    } else {
-      console.error("No web3 provider detected!");
-      this.setState({error: "Oops, this app needs a Web3 enabled browser!"});
-      return;
-    }
-
-    return this.instantiateContracts();
-  }
-
-  updateAccounts = async (accounts) => {
-    const firstTime = !(this.accounts && this.accounts[0]);
-    this.accounts = accounts || await this.web3.eth.getAccounts();
-    if (!firstTime) {
-      this.updateApp();
-    }
-  }
-
-
-
-  claimReward = async () => {
-    return await this.state.estile.claimReward({from: this.accounts[0]});
-  }
-
-  instantiateContracts = async () => {
-    const contract = require("@truffle/contract");
-    const user = this.accounts[0];
-    
-    this.contracts_abi.EscapeToken = contract(_EscapeToken);
-    this.contracts_abi.ESTile = contract(_ESTile);
-    this.contracts_abi.ESTileWrapper = contract(_ESTileWrapper);
-    this.contracts_abi.NamingContract = contract(_NamingContract);
-
-    this.contracts_abi.EscapeToken.setProvider(window.web3.currentProvider);
-    this.contracts_abi.ESTile.setProvider(window.web3.currentProvider);
-    this.contracts_abi.ESTileWrapper.setProvider(window.web3.currentProvider);
-    this.contracts_abi.NamingContract.setProvider(window.web3.currentProvider);
-
-    let escape = await this.contracts_abi.EscapeToken.deployed();
-    let estile = await this.contracts_abi.ESTile.deployed();
-    let estilewrap = await this.contracts_abi.ESTileWrapper.deployed();
-    let namer = await this.contracts_abi.NamingContract.deployed();
-
-    await this.subscribeToEvents(estile);    
-
-    let escapeBalance = await escape.balanceOf(user);
-    let escapeClaimable = await estile.getClaimInfo({from: user});
-    let numClaims = await estile.claimLength(user);
-    
-    /*
-     *  Now we need to figure how many scenes there are and how many puzzles 
-     *  in each scene. If we have tokens that correspond to a scene, we list 
-     *  them here.
-     */
-    let numScenes = await estile.sceneCount();
-
-    /*
-     *  Update app state!
-     */
-    this.setState({
-      numClaims: numClaims,
-      numScenes: numScenes,
-      escapeBalance: escapeBalance,
-      escapeClaimable: escapeClaimable,
-
-      escape: escape,
-      estile: estile,
-      estilewrap: estilewrap,
-      namer: namer,
-    });
-  }
-
-  subscribeToEvents = async (estile) => {
-    console.log("subscribe...");
-    estile.allEvents()
+      setEscapeBalance(await escape.balanceOf(account));
+      setEscapeClaimable(await estile.getClaimInfo({from: account}))
+      setNumClaims(await estile.claimLength(account));
+      
+      /*
+      *  Now we need to figure how many scenes there are and how many puzzles 
+      *  in each scene. If we have tokens that correspond to a scene, we list 
+      *  them here.
+      */
+      setNumScenes(await estile.sceneCount());
+     
+      estile.allEvents()
       .on("data", (e) => {
         console.log(e);
       })
       .on("error", (err) => {
         console.log("error", err);
       });
-  }
+    }
+    setupBalances();
+  }, [account, estile, escape, 
+      setNumScenes, setNumClaims, setEscapeBalance, setEscapeClaimable])
+
+  const connectInjectedWallet = useCallback(() => {
+    setActivatingConnector(injected)
+    activate(injected);
+  }, [setActivatingConnector, activate]);
+
+  // Activating - the wallet is attempting to open.
+  const activating = injected === activatingConnector;
+  // Connected - the account is connected.
+  const connected = injected === connector;
 
   ////////////////////////////////////////////////////////////////////////////
-  //  Accounts and other web3.eth stuff.
-  ////////////////////////////////////////////////////////////////////////////
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  //  Round updates for totals, percentages UI etc as well as refresh logic.
-  ////////////////////////////////////////////////////////////////////////////
-
-  updateApp = async() => {    
-    // console.log("Account0      = ", this.accounts[0]);
-    // console.log("EscapeToken   = ", this.contracts["EscapeToken"].address);
-    // console.log("ESTile        = ", this.contracts["ESTile"].address);
-    // console.log("ESTileWrapper = ", this.contracts["ESTileWrapper"].address);
-    this.setState({
-      // TODO
-    });
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Contract interaction.
-  ////////////////////////////////////////////////////////////////////////////
-  
-  ////////////////////////////////////////////////////////////////////////////
-  // User Interaction.
-  ////////////////////////////////////////////////////////////////////////////
-
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <NavLink exact activeClassName="isActive" to="/">EtherScapes</NavLink>
-          <NavLink exact activeClassName="isActive" to="/about">FAQ</NavLink>
-          <div className="grow"></div>
-          <div className="balance" data-tip data-for="balanceTooltip">
-            {this.state.escapeBalance.toString()} ESC
-          </div>
-          {this.state.escapeClaimable !== undefined && this.state.escapeClaimable.toNumber() > 0 && 
-            <div className="balance clickable" 
-                 onClick={()=> {this.claimReward()}} 
-                 data-tip data-for="claimTooltip">
-              ({this.state.escapeClaimable.toString()}, +{this.state.numClaims.toString()} per day)
-            </div>
-          }
-          {this.state.escapeClaimable !== undefined && this.state.escapeClaimable.toNumber() === 0 && 
-            <div className="balance" data-tip data-for="claimTooltip">
-              ({this.state.escapeClaimable.toString()}, +{this.state.numClaims.toString()} per day)
-            </div>
-          }
-          <ReactTooltip id="claimTooltip" arrowColor="var(--color-font)" place="bottom">
-            <p>Claimable ESCAPE, <br></br>
-               earnings per day.
-            </p>
-          </ReactTooltip>   
-          <ReactTooltip id="balanceTooltip" arrowColor="var(--color-font)" place="bottom">
-            <p>Your current ESCAPE balance.</p>
-          </ReactTooltip>   
+  return (
+    <div className="App">
+      <div className="App-header">
+        <NavLink exact activeClassName="isActive" to="/">EtherScapes</NavLink>
+        <NavLink exact activeClassName="isActive" to="/about">FAQ</NavLink>
+        <div className="grow"></div>
+        <div className="balance" data-tip data-for="balanceTooltip">
+          {escapeBalance.toString()} ESC
         </div>
-        <div className="App-body">
-          <div className="App-scroll">
-            <div style={{flexGrow: 1}}>
-              {!this.state.error &&
-                <MainLayout 
-                  balance={this.state.escapeBalance}
-                  claim={this.state.escapeClaimable}
-                  numScenes={this.state.numScenes}
-                  numPacks={this.state.numPacks}
-                  escape={this.state.escape}
-                  estile={this.state.estile}
-                  namer={this.state.namer}
-                  estilewrap={this.state.estilewrap} 
-                  user={this.accounts[0]}
-                />
-              }
-              {this.state.error &&
-                <div className="error">{this.state.error}</div>
-              }
-            </div>
-            <Footer />
+        {escapeClaimable !== undefined && escapeClaimable.toNumber() > 0 && 
+          <div className="balance clickable" 
+                onClick={claimReward} 
+                data-tip data-for="claimTooltip">
+            ({escapeClaimable.toString()}, +{numClaims.toString()} per day)
           </div>
+        }
+        {escapeClaimable !== undefined && escapeClaimable.toNumber() === 0 && 
+          <div className="balance" data-tip data-for="claimTooltip">
+            ({escapeClaimable.toString()}, +{numClaims.toString()} per day)
+          </div>
+        }
+        <ReactTooltip id="claimTooltip" arrowColor="var(--color-font)" place="bottom">
+          <p>Claimable ESCAPE, <br></br>
+              earnings per day.
+          </p>
+        </ReactTooltip>   
+        <ReactTooltip id="balanceTooltip" arrowColor="var(--color-font)" place="bottom">
+          <p>Your current ESCAPE balance.</p>
+        </ReactTooltip>   
+      </div>
+      <div className="App-body">
+        <div className="App-scroll">
+          <div style={{flexGrow: 1}}>
+            <MainLayout 
+              connectWallet={connectInjectedWallet}
+              connected={connected}
+              activating={activating}
+              active={active}
+              contractsLoaded={contractsLoaded}
+              user={account}
+              balance={escapeBalance}
+              claim={escapeClaimable}
+              numScenes={numScenes}
+              escape={escape}
+              estile={estile}
+              namer={namer}
+              estilewrap={estilewrap} 
+              error={error}
+            />
+          </div>
+          <Footer />
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

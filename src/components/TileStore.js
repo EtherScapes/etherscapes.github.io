@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { useHistory } from "react-router";
 import ReactTooltip from "react-tooltip";
 
@@ -8,9 +8,6 @@ import {BuyTilesModal} from "./Overlays.js";
 
 import "./TileStore.css";
 
-import CollectSVG from "../svg/collect.svg";
-import SolveSVG from "../svg/puzzle.svg";
-import EarnSVG from "../svg/salary.svg";
 import BuySVG from "../svg/buy.svg";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,6 +17,8 @@ var Web3 = require("web3");
 ////////////////////////////////////////////////////////////////////////////////
 
 const TileStore = (props) => {
+  const {active, connected, user, estile, numScenes} = props;
+
   const history = useHistory();
   const [isLoading, setLoading] = useState(true);
   const [scenes, setScenes] = useState([]);
@@ -34,7 +33,7 @@ const TileStore = (props) => {
   //////////////////////////////////////////////////////////////////////////////
 
   const updateSceneInfo = async (sidx) => {
-    let desc = await getSceneInfo(props.estile, props.user, sidx);
+    let desc = await getSceneInfo(estile, user, sidx);
     let found = false;
     let _scenes = scenes.map((sdesc) => {
       if (sdesc.sceneId === desc.sceneId) {
@@ -52,17 +51,21 @@ const TileStore = (props) => {
   
   //////////////////////////////////////////////////////////////////////////////
 
-  if (!props.estile || !props.user) {
-    return <Loading message="Talking to contract" />;
-  }
-
-  if (props.estile && props.user && props.numScenes && isLoading) {
-    getAllSceneInfo(props.estile, props.user, props.numScenes.toNumber())
+  useEffect(() => {
+    if (!estile || !user || !numScenes) return;
+    getAllSceneInfo(estile, user, numScenes.toNumber())
       .then((_scenes) => {
         setScenes(_scenes)
         setLoading(false);
       });
-    return <Loading message="Loading scenes" />;
+  }, [isLoading, estile, user, numScenes]);
+  
+  if (isLoading) {  
+    return (
+      <div className="info-main">
+        <Loading message="Loading scenes" />
+      </div>
+    );
   } 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -134,51 +137,17 @@ const TileStore = (props) => {
 
   return (
     <>
-      <div className="tooltips">
-        <ReactTooltip id="infoEscapeTooltip" arrowColor="var(--color-font)">
-          <p><span role="img" aria-label="burn">🔥</span> Burn ESCAPE (ERC20) for shards from open rifts.</p>
-          <p><span role="img" aria-label="burn">🔥</span> Burn ESCAPE to (re)name solved puzzles.</p>
-        </ReactTooltip>
-        <ReactTooltip id="infoShardTooltip" arrowColor="var(--color-font)">
-          <p><span role="img" aria-label="tile">🧩</span> Shards are puzzle pieces from EtherScape rifts.</p>
-          <p><span role="img" aria-label="contract">📰</span> Each shard is a NFT (ERC1155) with limited supply.</p>
-          <p><span role="img" aria-label="factory">🚧</span> Rifts will mint random shards until they run out.</p>
-          <p><span role="img" aria-label="earn">💰</span> Trade shard tokens on 3rd party markets.</p>
-        </ReactTooltip>
-        <ReactTooltip id="infoPuzzleTooltip" arrowColor="var(--color-font)">
-          <p><span role="img" aria-label="tile">🧩</span> Each rift contains a set number of puzzles to solve.</p>
-          <p><span role="img" aria-label="burn">🔥</span> Burn all shards from a puzzle to solve it.</p>
-          <p><span role="img" aria-label="earn">💰</span> Solved puzzles reward even rarer NFTs and earn 1 ESCAPE per day.</p>
-          <p><span role="img" aria-label="earn">💰</span> Trade completed puzzle tokens on 3rd party markets.</p>
-        </ReactTooltip>
-      </div>
-      <div className="TileStore-main">
         <BuyTilesModal
           {...props} 
           sceneId={buyTilesForSceneId}
           updateSceneInfo={updateSceneInfo} 
           close={() => {setBuyTilesForSceneId(0)}} />
-        <div className="TileStore-blurb">
-          <div className="clickable" data-tip data-for="infoShardTooltip" data-effect="solid" data-place="bottom">
-            <img src={CollectSVG} alt="collect" />
-            <div>collect shards</div>
-          </div>
-          <div className="clickable" data-tip data-for="infoPuzzleTooltip" data-effect="solid" data-place="bottom">
-            <img src={SolveSVG} alt="solve" />
-            <div>solve puzzles</div>
-          </div>
-          <div className="clickable" data-tip data-for="infoEscapeTooltip" data-effect="solid" data-place="bottom">
-            <img src={EarnSVG} alt="earn" />
-            <div>earn ESCAPE</div>
-          </div>
-        </div>
-        <br></br>
+        
         <div className="TileStore-list">
           <h4>Open rifts</h4>
           {scenesDOM}
           {newRiftComingSoon}
         </div>
-      </div>
     </>
   );
 }

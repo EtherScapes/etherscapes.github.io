@@ -152,6 +152,13 @@ html, body {
 /*
  *  Home
  */
+
+ .info-main, .error-main {
+  justify-content: center;
+  align-items: center;
+}
+.info-main,
+.error-main,
 .Home-main {
   height: 100%;
   max-width: 720px;
@@ -374,6 +381,7 @@ a.clickable:visited {
 .shard-main .bg>img {
   padding: 20px;
   max-width: 420px;
+  max-height: 300px;
   height: auto;
   padding: 12px;
   background-color: var(--color-header);

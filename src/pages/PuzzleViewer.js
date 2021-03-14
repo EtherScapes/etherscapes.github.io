@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useRef, useEffect, useCallback} from "react";
 import { useParams } from "react-router";
 import { useHistory } from "react-router-dom";
 import ReactTooltip from "react-tooltip";
@@ -14,31 +14,34 @@ import BuySVG from "../svg/buy.svg";
 ////////////////////////////////////////////////////////////////////////////////
 
 const Tile = (props) => {
+  const {estile, user, id, type, updateFn} = props;
   const [balance, setBalance] = useState("...");
   const [total, setTotal] = useState("...");
   const [isLoading, setLoading] = useState(true);
 
-  if (props.estile && props.user && isLoading) {
-    getTokenBalance(props.estile, props.user, props.id)
+  const update = useEffect(() => {
+    getTokenBalance(estile, user, id)
       .then((result) => {
         setBalance(result.balance);
         setTotal(result.supply);
         setLoading(false);
-        if (props.update) { 
-          props.update(props.id, {
-            id: props.id, 
+        if (updateFn) { 
+          updateFn(id, {
+            id: id, 
             balance: result.balance,
             total: result.supply,
           });
         }
       });
-  }
+    }, [estile, user, id, updateFn,
+        setBalance, setTotal, setLoading]);
+
   return (
-    <div className="th shard-row" onClick={()=>{props.preview(props.id)}}>
-      <div><img src={tileImgUri(props.id)} alt="" width="42px" height="auto"></img> ({props.type})</div>
+    <div className="th shard-row" onClick={()=>{props.preview(id)}}>
+      <div><img src={tileImgUri(id)} alt="" width="42px" height="auto"></img> ({type})</div>
       <div>{balance.toString()}</div>
       <div>{total.toString()}</div>
-      <div>{prettyfyId(nftId(props.id))}</div>
+      <div>{prettyfyId(nftId(id))}</div>
     </div>
   );
 }
@@ -76,6 +79,7 @@ const PuzzleViewer = (props) => {
   const [puzzleToken, setPuzzleToken] = useState({});
   const updatePuzzleToken = (id, tdesc) => {
     if (canvasRef.current.hasBackground !== id) canvasRef.current.hasBackground = undefined;
+    console.log("PUZZLE TOKEN UPDATE = ", tdesc)
     setPuzzleToken(tdesc);
   }
   
@@ -85,13 +89,16 @@ const PuzzleViewer = (props) => {
 
   const ownsSolvedToken = puzzleToken && puzzleToken.balance && puzzleToken.balance.toNumber() > 0;
 
-  const draw = async (context, reset=false) => {
+  const draw = useCallback(async (context, reset=false) => {
+    console.log(sceneDesc)
     if (sceneDesc.sceneId === undefined) return;
     
     const ptok = sceneDesc.puzzleTokenStart + puzzleId;
     const canvas = canvasRef.current;
 
+    console.log(puzzleToken)
     if (!canvas.hasBackground && puzzleToken.balance !== undefined) {
+      console.log("No background - drawing");
       var img = new Image();
       img.width = 1920;
       img.height = 1080;
@@ -105,6 +112,7 @@ const PuzzleViewer = (props) => {
     }
     
     if (canvas.hasBackground) {
+      console.log("has background - drawing tiles");
       for (let tok of ownedTokens) {
         // Tokens with no ownership are not drawn.
         if (tok.balance.toNumber() === 0) continue;
@@ -129,7 +137,7 @@ const PuzzleViewer = (props) => {
         timg.src = tileMeta.image; 
       }
     }
-  }
+  });
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -162,6 +170,7 @@ const PuzzleViewer = (props) => {
     if (sceneLoading) return;
     const canvas = canvasRef.current
     const context = canvas.getContext("2d")
+    console.log("DRAWING");
     draw(context);
     refreshPuzzleNameInfo(sceneId, puzzleId);
   }, [draw, refreshPuzzleNameInfo, sceneId, puzzleId, sceneLoading, ownedTokens, puzzleToken, sceneDesc]);
@@ -213,7 +222,7 @@ const PuzzleViewer = (props) => {
     const tileTokenStart = sceneDesc.tileTokenStart + tileTokenOffset;
     
     puzzleTokenRow = <Tile {...props} 
-                           update={updatePuzzleToken} 
+                           updateFn={updatePuzzleToken} 
                            preview={(id) => {setPreviewTokenId(id)}}
                            type="puzzle" id={puzzleTokenId} 
                            key={puzzleTokenId} />;
@@ -222,7 +231,7 @@ const PuzzleViewer = (props) => {
       puzzleTileTokenRows.push(
         <Tile {...props} 
               preview={(id) => {setPreviewTokenId(id)}}
-              update={updateOwnedTokens} 
+              updateFn={updateOwnedTokens} 
               type="tile" id={tileTokenStart+i} key={tileTokenStart+i} />
       );
     }

@@ -45,16 +45,20 @@ export const ShardInner = (props) => {
       </div>
       <p>{desc.description}</p>
       <p>The NFT id for this shard is {prettyId}.</p>
-      <p>There are currently {tokInfo.supply.toString()} of these tokens in existence, and you own {tokInfo.balance.toString()} of them!
-      </p>
-      <div className="social-link">
-        <div>View this NFT on: </div>
-        <div>
-          <a href={"https://opensea.io/assets/"+props.estile.address+"/"+props.id}>
-            <img src={OpenSeaLogo} alt="OpenSea" /><span>OpenSea</span>
-          </a>
+      {tokInfo.supply.toNumber() > 0 && <>
+        <p>There are currently {tokInfo.supply.toString()} of these tokens in existence, and you own {tokInfo.balance.toString()} of them!</p>
+        <div className="social-link">
+          <div>View this NFT on: </div>
+          <div>
+            <a target="_blank" rel="noopener noreferrer" href={"https://opensea.io/assets/"+props.estile.address+"/"+props.id}>
+              <img src={OpenSeaLogo} alt="OpenSea" /><span>OpenSea</span>
+            </a>
+          </div>
         </div>
-      </div>
+      </>}
+      {tokInfo.supply.toNumber() === 0 && <>
+        <p>There are no copies of this token in existence! Once minted, it will be visible for trade on OpenSea etc.</p>
+      </>}
     </div>
   );
 }
