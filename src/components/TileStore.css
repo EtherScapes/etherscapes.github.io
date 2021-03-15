@@ -10,6 +10,7 @@
   margin: 0 auto;
   display: flex;
 }
+.TileStore-blurb-tip,
 .TileStore-blurb {
   display: flex;
   flex-wrap: wrap;
@@ -18,7 +19,7 @@
   align-items: center;
   max-width: 100%;
   min-width: 420px;
-  margin: 50px 0px 25px 0px;
+  margin: 50px 0px 0px 0px;
   padding: 20px 30px 30px 30px;
   background-color: var(--color-header);
   color: var(--color-special);
@@ -37,6 +38,17 @@
 .TileStore-blurb p {
   width: 100%;
   margin: 10px
+}
+.TileStore-blurb-tip {
+  margin-top: 0;
+  color: var(--color-font);
+  justify-content: center;
+}
+.TileStore-blurb-tip>.clickable:before,
+.TileStore-blurb-tip>.clickable:after {
+  content: "-";
+  cursor: default;
+  color: var(--color-header);
 }
 
 .TileStore-list {

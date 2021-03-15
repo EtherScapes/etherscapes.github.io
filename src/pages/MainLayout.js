@@ -23,17 +23,12 @@ const MainLayout = (props) => {
       <Route exact path="/about">
         <About></About>
       </Route>
-          
-      {props.contractsLoaded &&
-        <Route exact path="/scene/:sid/puzzle/:pid">
-          <PuzzleViewer page="PuzzleViewer" {...props} />
-        </Route>
-      }
-      {props.contractsLoaded &&
-        <Route exact path="/shard/:id">
-          <Shard page="Shard" {...props} />
-        </Route>
-      }
+      <Route exact path="/scene/:sid/puzzle/:pid">
+        <PuzzleViewer page="PuzzleViewer" {...props} />
+      </Route>
+      <Route exact path="/shard/:id">
+        <Shard page="Shard" {...props} />
+      </Route>
       <Route path="*">
         <Redirect to="/" />
       </Route>

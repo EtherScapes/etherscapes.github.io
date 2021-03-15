@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.70d52200.chunk.css",
-    "main.js": "/static/js/main.d219d664.chunk.js",
-    "main.js.map": "/static/js/main.d219d664.chunk.js.map",
+    "main.css": "/static/css/main.d42d2e09.chunk.css",
+    "main.js": "/static/js/main.9c9683c2.chunk.js",
+    "main.js.map": "/static/js/main.9c9683c2.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.e0770c88.js",
     "runtime-main.js.map": "/static/js/runtime-main.e0770c88.js.map",
-    "static/js/2.8b21a3d9.chunk.js": "/static/js/2.8b21a3d9.chunk.js",
-    "static/js/2.8b21a3d9.chunk.js.map": "/static/js/2.8b21a3d9.chunk.js.map",
+    "static/js/2.eefc22f2.chunk.js": "/static/js/2.eefc22f2.chunk.js",
+    "static/js/2.eefc22f2.chunk.js.map": "/static/js/2.eefc22f2.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.e03db5f39486af0cabef4c39531aa2d8.js": "/precache-manifest.e03db5f39486af0cabef4c39531aa2d8.js",
+    "precache-manifest.a890f818e95a986bc18208167e6c208d.js": "/precache-manifest.a890f818e95a986bc18208167e6c208d.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.70d52200.chunk.css.map": "/static/css/main.70d52200.chunk.css.map",
-    "static/js/2.8b21a3d9.chunk.js.LICENSE.txt": "/static/js/2.8b21a3d9.chunk.js.LICENSE.txt",
+    "static/css/main.d42d2e09.chunk.css.map": "/static/css/main.d42d2e09.chunk.css.map",
+    "static/js/2.eefc22f2.chunk.js.LICENSE.txt": "/static/js/2.eefc22f2.chunk.js.LICENSE.txt",
     "static/media/buy.svg": "/static/media/buy.fcafa681.svg",
     "static/media/collect.svg": "/static/media/collect.25b81051.svg",
     "static/media/discord.svg": "/static/media/discord.e2217522.svg",
@@ -20,12 +20,13 @@
     "static/media/puzzle.svg": "/static/media/puzzle.79cd76ae.svg",
     "static/media/reddit.svg": "/static/media/reddit.1dee27c4.svg",
     "static/media/App.css": "/static/media/regular.2db009d8.ttf",
-    "static/media/salary.svg": "/static/media/salary.c4c37578.svg"
+    "static/media/salary.svg": "/static/media/salary.c4c37578.svg",
+    "static/media/twitter.svg": "/static/media/twitter.3ad6654a.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.e0770c88.js",
-    "static/js/2.8b21a3d9.chunk.js",
-    "static/css/main.70d52200.chunk.css",
-    "static/js/main.d219d664.chunk.js"
+    "static/js/2.eefc22f2.chunk.js",
+    "static/css/main.d42d2e09.chunk.css",
+    "static/js/main.9c9683c2.chunk.js"
   ]
 }

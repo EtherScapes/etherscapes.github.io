@@ -134,7 +134,6 @@ html, body {
  *  Body spans rest of space.
  */
 .App-body {
-  height: calc(100vh - 50px);
   display: flex;
   justify-content: center;
   overflow-y: scroll;
@@ -142,7 +141,7 @@ html, body {
 }
 .App-scroll {
   width: 100%;
-  min-height: calc(100vh - 50px);
+  height: calc(100vh - 50px);
   display: flex;
   flex-direction: column;
 }
@@ -425,6 +424,7 @@ a.clickable:visited {
   height: 0;
   overflow: visible;
 }
+#networkInfoTooltip,
 #infoShardTooltip,
 #infoPuzzleTooltip,
 #infoEscapeTooltip,

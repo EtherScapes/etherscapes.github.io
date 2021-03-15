@@ -1,37 +1,19 @@
-import React from "react";
+import React, {useState} from "react";
 import ReactTooltip from "react-tooltip";
 
 import TileStore from "../components/TileStore.js";
-import {Loading} from "../components/Loading.js";
+import {PageInfoPanel} from "../components/PageInfoPanel.js";
 
 
 import CollectSVG from "../svg/collect.svg";
 import SolveSVG from "../svg/puzzle.svg";
 import EarnSVG from "../svg/salary.svg";
 
-import { UnsupportedChainIdError } from "@web3-react/core"
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected
-} from "@web3-react/injected-connector"
-
-const decodeError = (err) => {
-  if (err instanceof NoEthereumProviderError) {
-    return "No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile."
-  } else if (err instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network."
-  } else if (err instanceof UserRejectedRequestErrorInjected) {
-    return "Please authorize this website to access your Ethereum account."
-  } else if (err !== undefined) {
-    console.error(err)
-    return "An unknown error occurred. Check the console for more details."
-  }
-  return undefined;
-}
 
 const Packs = (props) => {
-  const {activating, error, active, connected, contractsLoaded, user} = props;
-  const errMsg = decodeError(error);
+  const {active, connected, contractsLoaded, user} = props;
+  const [showTip, setShowTip] = useState(true);
+
   return (
     <div className="TileStore-main">
       <div className="tooltips">
@@ -67,27 +49,16 @@ const Packs = (props) => {
             <div>earn ESCAPE</div>
           </div>
         </div>
+        {showTip && 
+          <div className="TileStore-blurb-tip">
+            (Hint: Anything <span className="clickable">green</span> can be interacted with.)
+            <span className="grow"></span>
+            <span className="clickable" onClick={() => {setShowTip(false)}}>[x]</span>
+          </div>
+        }
         <br></br>
         {!(active && connected && user && contractsLoaded) &&
-          <div className="info-main">
-            {error && errMsg && 
-              <div className="err">
-                {errMsg}
-              </div>
-            }
-            {!activating && !connected && 
-              <div className="info">
-                <p onClick={()=>{props.connectWallet()}}>Connect your metamask wallet to continue.</p>
-                <p>Check out our <a className="clickable" href="/#/about">FAQ</a> to learn more.</p>
-              </div>
-            }
-            {activating && !connected && 
-              <Loading message="Connecting to wallet" />
-            }
-            {active && connected && !contractsLoaded && 
-              <Loading message="Loading contracts" />
-            }
-          </div>
+          <PageInfoPanel {...props} />
         }
         {active && connected && user && contractsLoaded &&
           <TileStore {...props} />

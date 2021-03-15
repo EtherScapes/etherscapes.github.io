@@ -1,10 +1,15 @@
 import React, {useState} from "react";
 
 const FAQSection = (props) => {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(props.open || false);
+  const glyph = show ? "[-]" : "[+]";
   return (
     <div className="faq-section">
-      <div className="faq-question" onClick={() => {setShow(!show)}}>{props.question}</div>
+      <div className="faq-question" onClick={() => {setShow(!show)}}>
+        {props.question}
+        <span className="grow"></span>
+        <span style={{marginRight: "50px"}} className="clickable">{glyph}</span>
+      </div>
       {show && <div className="faq-body">{props.children}</div>}
     </div>
   );
@@ -13,7 +18,7 @@ const FAQSection = (props) => {
 const About = () => {
   return (
     <div className="faq-main">
-      <FAQSection question="What are EtherScapes?">
+      <FAQSection question="What are EtherScapes?" open={true}>
         <p>
           EtherScapes are procedurally generated NFT puzzles. 
         </p>
@@ -22,7 +27,23 @@ const About = () => {
           made of puzzle shards. Solve puzzles by collecting all the relevant 
           shard pieces and trading them in for a super-rare puzzle NFT. 
         </p>
-      </FAQSection>
+        <p>
+          <img style={{maxWidth: "70%", margin: "10px 15%", border: "2px solid var(--color-header-alpha)"}} 
+               src="https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/0000000000000000000000000000000000000000000000000000000000000026.png" alt="rift 1 puzzle" />
+          <div style={{width: "100%", textAlign: "center"}}>A puzzle from our very first genesis rift</div>
+        </p>
+        <p>
+          <div style={{display: "flex", justifyContent: "space-around"}}>
+            <img style={{maxWidth: "20%", margin: "10px 2%", padding: "10px", background: "#00000030", border: "2px solid var(--color-header-alpha)"}} 
+                src="https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/0000000000000000000000000000000000000000000000000000000000000003.png" alt="rift 1 shard" />
+            <img style={{maxWidth: "20%", margin: "10px 2%", padding: "10px", background: "#00000030", border: "2px solid var(--color-header-alpha)"}} 
+                src="https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/000000000000000000000000000000000000000000000000000000000000000f.png" alt="rift 1 shard" />
+            <img style={{maxWidth: "20%", margin: "10px 2%", padding: "10px", background: "#00000030", border: "2px solid var(--color-header-alpha)"}} 
+                src="https://raw.githubusercontent.com/EtherScapes/metadata/master/tile/0000000000000000000000000000000000000000000000000000000000000019.png" alt="rift 1 shard" />
+          </div>
+          <div style={{width: "100%", textAlign: "center"}}>puzzle shards</div>
+        </p>
+      </FAQSection> 
 
       <FAQSection question="How does it work?">
         <p>
@@ -30,9 +51,15 @@ const About = () => {
           has a limited number of shards available - grab yours today!
         </p>
         <p>
+          <img style={{maxWidth: "70%", margin: "10px 15%", border: "2px solid var(--color-header-alpha)"}} 
+               src="https://raw.githubusercontent.com/EtherScapes/metadata/master/img/buy-shards.png" alt="faq-buy-shards" />
+        </p>
+        <p>
           Each shard is minted at random by the rift, once you have all the shards
-          in a puzzle, you can trade them in for the solved puzzle NFT. This NFT
-          is special and earns you 1 ESCAPE per day per solved NFT you own!
+          in a puzzle, you can trade them in for the solved puzzle NFT.
+        </p>
+        <p>
+          The solved puzzle NFT is special, and earns 1 ESCAPE per day.
         </p>
       </FAQSection>
       
@@ -68,7 +95,7 @@ const About = () => {
         <p>
           All of the code involved in this project is available on GitHub and is 
           100% open source. Check out our 
-          <a href="https://github.com/etherscapes">GitHub project page</a> for more info.
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/etherscapes">GitHub project page</a> for more info.
         </p>
         <p>
           The contract was developed using Solidity, with tests implemented to boot.
@@ -79,9 +106,9 @@ const About = () => {
         </p>
         <p>
           We love feedback, and would appreciate your thoughts either in our 
-          <a href="https://discord.gg/kTmmeB6bes">Discord</a>, 
-          <a href="https://reddit.com/r/etherscapes">Reddit</a>,
-          <a href="https://github.com/etherscapes">GitHub</a> channels.
+          <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/kTmmeB6bes">Discord</a>, 
+          <a target="_blank" rel="noopener noreferrer" href="https://reddit.com/r/etherscapes">Reddit</a>,
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/etherscapes">GitHub</a> channels.
         </p>
       </FAQSection>
     </div>

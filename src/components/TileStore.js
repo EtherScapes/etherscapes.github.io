@@ -17,7 +17,7 @@ var Web3 = require("web3");
 ////////////////////////////////////////////////////////////////////////////////
 
 const TileStore = (props) => {
-  const {active, connected, user, estile, numScenes} = props;
+  const {user, estile, numScenes} = props;
 
   const history = useHistory();
   const [isLoading, setLoading] = useState(true);
