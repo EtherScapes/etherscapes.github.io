@@ -30,7 +30,7 @@ const Packs = (props) => {
         <ReactTooltip id="infoPuzzleTooltip" arrowColor="var(--color-font)">
           <p><span role="img" aria-label="tile">🧩</span> Each rift contains a set number of puzzles to solve.</p>
           <p><span role="img" aria-label="burn">🔥</span> Burn all shards from a puzzle to solve it.</p>
-          <p><span role="img" aria-label="earn">💰</span> Solved puzzles reward even rarer NFTs and earn 1 ESCAPE per day.</p>
+          <p><span role="img" aria-label="earn">💰</span> Earn rare NFTs, and ESCAPE.</p>
           <p><span role="img" aria-label="earn">💰</span> Trade completed puzzle tokens on 3rd party markets.</p>
         </ReactTooltip>
       </div>

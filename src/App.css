@@ -512,3 +512,6 @@ a.clickable:visited {
 .faq-body a:visited {
   color: var(--color-special);
 }
+.faq-body p {
+  line-height: 1.3em;
+}

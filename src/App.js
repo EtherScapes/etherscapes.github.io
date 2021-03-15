@@ -162,6 +162,7 @@ const App = (props) => {
 
   // Connected - the account is connected.
   const connected = injected === connector;
+  const appStatus = !connected ? "not connected" : (networkName+" : "+prettyAddress);
 
   ////////////////////////////////////////////////////////////////////////////
   return (
@@ -196,7 +197,7 @@ const App = (props) => {
           <p>Your current ESCAPE balance.</p>
         </ReactTooltip>
         <ReactTooltip id="networkInfoTooltip" arrowColor="var(--color-font)" place="bottom">
-          <p>{networkName} : {prettyAddress}</p>
+          <p>{appStatus}</p>
         </ReactTooltip>
 
       </div>
