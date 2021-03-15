@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useHistory } from "react-router";
 
 import {Loading} from "./Loading.js";
 
@@ -26,13 +27,14 @@ const decodeError = (err) => {
 export const ConnectWallet = (props) => {
   return (
     <div className="info">
-      <p onClick={()=>{props.connect()}}>Connect your metamask wallet to continue.</p>
+      <p><span className="clickable" onClick={()=>{props.connect()}}>Connect wallet </span> to continue.</p>
       <p>Check out our <a className="clickable" href="/#/about">FAQ</a> to learn more.</p>
   </div>
   )
 }
 
 export const PageInfoPanel = (props) => {
+  let history = useHistory();
   const {error, activating, connected, connectWallet, active, contractsLoaded} = props;
   const errMsg = decodeError(error);
   return (
@@ -40,6 +42,7 @@ export const PageInfoPanel = (props) => {
       {error && errMsg && 
         <div className="err">
           {errMsg}
+          <div onClick={()=>{window.location.reload()}} className="clickable">try again.</div>
         </div>
       }
       {!activating && !connected && 
