@@ -476,7 +476,8 @@ a.clickable:visited {
 .faq-main {
   display: flex;
   flex-direction: column;
-  max-width: 85%;
+  width: 85%;
+  max-width: 800px;
   margin: 40px auto;
   height: 100%;
 }
