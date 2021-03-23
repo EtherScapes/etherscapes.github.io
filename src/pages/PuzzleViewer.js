@@ -3,6 +3,8 @@ import { useParams } from "react-router";
 import { useHistory } from "react-router-dom";
 import ReactTooltip from "react-tooltip";
 
+import web3 from "web3";
+
 import {Loading} from "../components/Loading.js";
 import {useInput} from "../components/Overlays.js";
 import {ProgressBar} from "../components/ProgressBar.js";
@@ -58,23 +60,20 @@ const PuzzleViewer = (props) => {
   const [buyTilesForSceneId, setBuyTilesForSceneId] = useState(0);
   const [previewTokenId, setPreviewTokenId] = useState(0);
 
-  const [ownedTokens, setOwnedTokens] = useState([]);
+  const [ownedTokens, setOwnedTokens] = useState({});
+  const [ownedTokensAllLoaded, setOwnedTokensAllLoaded] = useState(false);
+  const resetOwnedTokenState = () => {
+    setOwnedTokensAllLoaded(false);
+    setOwnedTokens({});
+  }
+
   const updateOwnedTokens = useCallback((id, tdesc) => {
-    let found = false;
-    const _owned = ownedTokens.map((odesc) => {
-      if (odesc.id === tdesc.id) {
-        found = true;
-        return tdesc;
-      } 
-      return odesc;
-    });
-    if (found) {
-      setOwnedTokens(_owned);
-    } else {
-      ownedTokens.push(tdesc)
-      setOwnedTokens(ownedTokens);
+    ownedTokens[id] = tdesc;
+    setOwnedTokens(ownedTokens);
+    if (Object.keys(ownedTokens).length == 12) { // HACK 
+      setOwnedTokensAllLoaded(true);
     }
-  }, [ownedTokens]);
+  }, [ownedTokens, setOwnedTokens, setOwnedTokensAllLoaded]);
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -110,14 +109,14 @@ const PuzzleViewer = (props) => {
     }
     
     if (canvas.hasBackground) {
-      for (let tok of ownedTokens) {
+      for (let tok of Object.keys(ownedTokens)) {
         // Tokens with no ownership are not drawn.
-        if (tok.balance.toNumber() === 0) continue;
+        if (ownedTokens[tok].balance.toNumber() === 0) continue;
 
         // Tokens drawn after a clear are not updated if they have also been drawn.
-        if (tok.id in canvas.drawnTokens) continue;
-        canvas.drawnTokens[tok.id] = true;
-        const tileJSON = tileDataUri(tok.id);
+        if (tok in canvas.drawnTokens) continue;
+        canvas.drawnTokens[tok] = true;
+        const tileJSON = tileDataUri(tok);
         const rsp = await fetch(tileJSON); 
         const tileMeta = await rsp.json();
         
@@ -185,14 +184,15 @@ const PuzzleViewer = (props) => {
     const canvas = canvasRef.current
     const context = canvas.getContext("2d")
     draw(context);
-  }, [draw, sceneId, puzzleId, sceneLoading, ownedTokens, puzzleToken, sceneDesc]);
+  }, [draw, sceneId, puzzleId, sceneLoading, ownedTokens, ownedTokensAllLoaded,
+      puzzleToken, sceneDesc]);
 
   //////////////////////////////////////////////////////////////////////////////
 
   const gotoScene = async (_sid, _pid) => {
     setShowPuzzleNaming(false);
     if (_sid !== sceneId) setSceneLoading(true);
-    if (_pid !== puzzleId) setOwnedTokens([]); // reset - ing puzzles.
+    if (_pid !== puzzleId) resetOwnedTokenState(); // reset - ing puzzles.
     history.push("/scene/" + _sid + "/puzzle/" + (_pid+1));
   }
   const prevScene = () => { if (sceneId > 1) gotoScene(sceneId - 1, 0); }
@@ -216,7 +216,6 @@ const PuzzleViewer = (props) => {
     const puzzleTokenId = sceneDesc.puzzleTokenStart + puzzleId;
     const tileTokenOffset = puzzleId * sceneDesc.tilesPerPuzzle
     const tileTokenStart = sceneDesc.tileTokenStart + tileTokenOffset;
-    
     setPuzzleTokenRow(<Tile {...props} 
                           updateFn={updatePuzzleToken}
                           preview={(id) => {setPreviewTokenId(id)}}
@@ -235,6 +234,25 @@ const PuzzleViewer = (props) => {
   }, [puzzleId, sceneDesc, sceneLoading, props, 
       updateOwnedTokens, updatePuzzleToken]);
 
+  const [uniqueTokensOwned, setUniqueTokensOwned] = useState(0);
+  const [totalTokensLoaded, setTotalTokensLoaded] = useState(0);
+
+  useEffect(() => {
+    async function _() {
+      if (!ownedTokensAllLoaded) return;
+      let count = 0;
+      for (var tok of Object.keys(ownedTokens)) {
+        const desc = ownedTokens[tok];
+        if (ownedTokens[tok].balance.gt(web3.utils.toBN(0))) {
+          count += 1;
+        }
+      }
+      const total = Object.keys(ownedTokens).length;
+      setUniqueTokensOwned(count);
+      setTotalTokensLoaded(total);
+    }
+    _();
+  }, [ownedTokensAllLoaded, setUniqueTokensOwned, setUniqueTokensOwned]);
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -255,13 +273,7 @@ const PuzzleViewer = (props) => {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-
-  const uniqueTokensOwned = ownedTokens.reduce((count, tokenDesc) => {
-    if (tokenDesc.balance > 0) {
-      return count + 1;
-    }
-    return count;
-  }, 0);
+  
 
   return (
     <>

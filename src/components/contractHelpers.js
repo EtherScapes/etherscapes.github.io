@@ -22,7 +22,7 @@ export const prettyfyId = (strId) => {
 }
 
 export const nftId = (id) => {
-  return id.toString(16).padStart(64, 0);
+  return Number(id).toString(16).padStart(64, 0);
 }
 
 export const tileImgUri = (id, useBW=false) => {
